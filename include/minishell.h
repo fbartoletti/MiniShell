@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/01/13 11:05:26 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/02 13:07:12 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,7 +217,7 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 /* TO DO LIST */
 //export 
 //pipe
-//exit con lettera mi deve uscire 
-//exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 1
+//sistemare exit con lettera mi deve uscire 
 //heredoc
 //expander $
+// mettere apposto funzioni lunghe executor.c / signals.c 

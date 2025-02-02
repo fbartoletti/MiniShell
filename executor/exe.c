@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:22:32 by barto             #+#    #+#             */
-/*   Updated: 2025/01/08 12:04:33 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/02 13:04:35 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,20 @@
 void	close_pipes(t_executor *exec)
 {
 	if (exec->prev_pipe != -1)
+	{
 		close(exec->prev_pipe);
+		exec->prev_pipe = -1;
+	}
 	if (exec->pipe_fd[0] != -1)
+	{
 		close(exec->pipe_fd[0]);
+		exec->pipe_fd[0] = -1;
+	}
 	if (exec->pipe_fd[1] != -1)
+	{
 		close(exec->pipe_fd[1]);
+		exec->pipe_fd[1] = -1;
+	}
 }
 
 void	init_executor(t_executor *exec)
