@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/02 13:07:12 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/02 13:20:30 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,7 @@ void 		check_command_path(char *cmd_path, char *cmd);
 void		handle_command_error(char *cmd);
 void		restore_redirections(int saved_stdin, int saved_stdout);
 int			setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout);
+int			prepare_pipes(t_executor *exec, t_command *current, t_minishell *shell);
 
 /* builtin.c and builtin_utils.c */
 int			ft_echo(t_minishell *shell, char **args);
@@ -206,6 +207,7 @@ void		restore_signals(void);
 /* clean.c */
 void		free_redir(t_redir *redir);
 void		free_command(t_command *cmd);
+void		free_commands(t_command *cmd);
 
 /* built_utils.c and cd_utils.c */
 char		*get_env_var(char **env, const char *name);
@@ -216,8 +218,8 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 
 /* TO DO LIST */
 //export 
-//pipe
+//fix pipe loop e doble free
 //sistemare exit con lettera mi deve uscire 
 //heredoc
 //expander $
-// mettere apposto funzioni lunghe executor.c / signals.c 
+// mettere apposto funzioni lunghe executor.c / signals.c / clean.c 

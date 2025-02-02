@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:21 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 18:03:59 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/02 13:15:58 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,23 @@ void	setup_pipes(t_executor *exec)
 {
 	if (exec->prev_pipe != -1)
 	{
-		dup2(exec->prev_pipe, STDIN_FILENO);
+		if (dup2(exec->prev_pipe, STDIN_FILENO) == -1)
+			exit(1);
 		close(exec->prev_pipe);
+		exec->prev_pipe = -1;
 	}
 	if (exec->pipe_fd[1] != -1)
 	{
-		dup2(exec->pipe_fd[1], STDOUT_FILENO);
+		if (dup2(exec->pipe_fd[1], STDOUT_FILENO) == -1)
+			exit(1);
 		close(exec->pipe_fd[1]);
+		exec->pipe_fd[1] = -1;
 	}
 	if (exec->pipe_fd[0] != -1)
+	{
 		close(exec->pipe_fd[0]);
+		exec->pipe_fd[0] = -1;
+	}
 }
 
 void	execute_external(t_minishell *shell, t_command *cmd)

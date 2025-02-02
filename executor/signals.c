@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:36:43 by barto             #+#    #+#             */
-/*   Updated: 2025/02/02 13:05:41 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/02 13:15:05 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,34 +18,33 @@ int	execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec)
 		return (0);
 	if (is_builtin(cmd->args[0]) && !cmd->next)
 		return (execute_builtin(shell, cmd));
-	handle_parent_signals();
 	exec->pid = fork();
 	if (exec->pid < 0)
 	{
-		restore_signals();
+		perror("minishell: fork");
 		return (-1);
 	}
 	if (exec->pid == 0)
 	{
 		handle_child_signals();
-		setup_pipes(exec);
+		if (exec->prev_pipe != -1)
+		{
+			dup2(exec->prev_pipe, STDIN_FILENO);
+			close(exec->prev_pipe);
+		}
+		if (exec->pipe_fd[1] != -1)
+		{
+			dup2(exec->pipe_fd[1], STDOUT_FILENO);
+			close(exec->pipe_fd[1]);
+		}
+		if (exec->pipe_fd[0] != -1)
+			close(exec->pipe_fd[0]);
 		handle_redirections(cmd);
-		
 		if (is_builtin(cmd->args[0]))
 			exit(execute_builtin(shell, cmd));
 		execute_external(shell, cmd);
 	}
-	if (exec->prev_pipe != -1)
-	{
-		close(exec->prev_pipe);
-		exec->prev_pipe = -1;
-	}
-	if (exec->pipe_fd[1] != -1)
-	{
-		close(exec->pipe_fd[1]);
-		exec->pipe_fd[1] = -1;
-	}
-	restore_signals();
+	handle_parent_signals();
 	return (0);
 }
 
