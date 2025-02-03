@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/02 13:20:30 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/03 17:31:00 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ typedef struct s_command
 	char				**args;
 	t_redir				*redirs;
 	struct s_command	*next;
+	pid_t				pid;
 }   t_command;
 
 typedef struct s_minishell
@@ -172,7 +173,6 @@ void		free_array(char **array);
 int			handle_heredoc(t_redir *redir);
 int			execute_commands(t_minishell *shell);
 void		execute_external(t_minishell *shell, t_command *cmd);
-int			execute_commands(t_minishell *shell);
 void		init_executor(t_executor *exec);
 void		close_pipes(t_executor *exec);
 void		wait_all_processes(t_minishell *shell, t_command *cmd);
@@ -222,4 +222,4 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 //sistemare exit con lettera mi deve uscire 
 //heredoc
 //expander $
-// mettere apposto funzioni lunghe executor.c / signals.c / clean.c 
+// mettere apposto funzioni lunghe executor.c / signals.c / clean.c / exe.c

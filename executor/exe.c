@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:22:32 by barto             #+#    #+#             */
-/*   Updated: 2025/02/02 13:04:35 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/03 17:37:45 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,23 +42,28 @@ void	init_executor(t_executor *exec)
 
 void	wait_all_processes(t_minishell *shell, t_command *cmd)
 {
-	int	status;
-	int	last_pid;
+	int status;
+    pid_t pid;
 
-	last_pid = -1;
-	while (cmd)
-	{
-		if (cmd->args && cmd->args[0])
-			last_pid = wait(&status);
-		cmd = cmd->next;
-	}
-	if (last_pid != -1)
-	{
-		if (WIFEXITED(status))
-			shell->exit_status = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			shell->exit_status = 128 + WTERMSIG(status);
-	}
+    while (cmd)
+    {
+        if (cmd->args && cmd->args[0])
+        {
+            pid = waitpid(-1, &status, 0);  // Aspetta qualsiasi processo figlio
+            if (pid == -1)
+            {
+                perror("waitpid error");
+            }
+            else
+            {
+                if (WIFEXITED(status))
+                    shell->exit_status = WEXITSTATUS(status);
+                else if (WIFSIGNALED(status))
+                    shell->exit_status = 128 + WTERMSIG(status);
+            }
+        }
+        cmd = cmd->next;
+    }
 }
 
 int	setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout)
