@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/03 17:31:00 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/04 13:12:38 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 # define ERR_TOKEN		"Tokenization error"
 # define ERR_PARSE		"Pars error"
 
-volatile sig_atomic_t	g_signal_received;
+extern int	g_signal_received;
 
 /* All my struct */
 typedef enum e_token_type
@@ -70,7 +70,6 @@ typedef struct s_command
 	char				**args;
 	t_redir				*redirs;
 	struct s_command	*next;
-	pid_t				pid;
 }   t_command;
 
 typedef struct s_minishell
@@ -173,6 +172,7 @@ void		free_array(char **array);
 int			handle_heredoc(t_redir *redir);
 int			execute_commands(t_minishell *shell);
 void		execute_external(t_minishell *shell, t_command *cmd);
+int			execute_commands(t_minishell *shell);
 void		init_executor(t_executor *exec);
 void		close_pipes(t_executor *exec);
 void		wait_all_processes(t_minishell *shell, t_command *cmd);
@@ -180,7 +180,6 @@ void 		check_command_path(char *cmd_path, char *cmd);
 void		handle_command_error(char *cmd);
 void		restore_redirections(int saved_stdin, int saved_stdout);
 int			setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout);
-int			prepare_pipes(t_executor *exec, t_command *current, t_minishell *shell);
 
 /* builtin.c and builtin_utils.c */
 int			ft_echo(t_minishell *shell, char **args);
@@ -207,7 +206,6 @@ void		restore_signals(void);
 /* clean.c */
 void		free_redir(t_redir *redir);
 void		free_command(t_command *cmd);
-void		free_commands(t_command *cmd);
 
 /* built_utils.c and cd_utils.c */
 char		*get_env_var(char **env, const char *name);
@@ -218,8 +216,8 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 
 /* TO DO LIST */
 //export 
-//fix pipe loop e doble free
-//sistemare exit con lettera mi deve uscire 
+//pipe
+//exit con lettera mi deve uscire 
+//exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 1
 //heredoc
 //expander $
-// mettere apposto funzioni lunghe executor.c / signals.c / clean.c / exe.c

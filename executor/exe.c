@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:22:32 by barto             #+#    #+#             */
-/*   Updated: 2025/02/03 17:37:45 by barto            ###   ########.fr       */
+/*   Updated: 2025/01/08 12:04:33 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,11 @@
 void	close_pipes(t_executor *exec)
 {
 	if (exec->prev_pipe != -1)
-	{
 		close(exec->prev_pipe);
-		exec->prev_pipe = -1;
-	}
 	if (exec->pipe_fd[0] != -1)
-	{
 		close(exec->pipe_fd[0]);
-		exec->pipe_fd[0] = -1;
-	}
 	if (exec->pipe_fd[1] != -1)
-	{
 		close(exec->pipe_fd[1]);
-		exec->pipe_fd[1] = -1;
-	}
 }
 
 void	init_executor(t_executor *exec)
@@ -42,28 +33,23 @@ void	init_executor(t_executor *exec)
 
 void	wait_all_processes(t_minishell *shell, t_command *cmd)
 {
-	int status;
-    pid_t pid;
+	int	status;
+	int	last_pid;
 
-    while (cmd)
-    {
-        if (cmd->args && cmd->args[0])
-        {
-            pid = waitpid(-1, &status, 0);  // Aspetta qualsiasi processo figlio
-            if (pid == -1)
-            {
-                perror("waitpid error");
-            }
-            else
-            {
-                if (WIFEXITED(status))
-                    shell->exit_status = WEXITSTATUS(status);
-                else if (WIFSIGNALED(status))
-                    shell->exit_status = 128 + WTERMSIG(status);
-            }
-        }
-        cmd = cmd->next;
-    }
+	last_pid = -1;
+	while (cmd)
+	{
+		if (cmd->args && cmd->args[0])
+			last_pid = wait(&status);
+		cmd = cmd->next;
+	}
+	if (last_pid != -1)
+	{
+		if (WIFEXITED(status))
+			shell->exit_status = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			shell->exit_status = 128 + WTERMSIG(status);
+	}
 }
 
 int	setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout)

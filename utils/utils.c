@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 12:14:47 by barto             #+#    #+#             */
-/*   Updated: 2025/02/02 13:18:44 by barto            ###   ########.fr       */
+/*   Updated: 2025/01/08 11:53:04 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,15 @@ void	free_tokens(t_token *tokens)
 	}
 }
 
-void free_commands(t_command *cmd)
+void	free_commands(t_command *cmd)
 {
-	t_command *current;
-	t_command *next;
-
-	current = cmd;
-	while (current)
+	t_command	*tmp;
+	
+	while (cmd)
 	{
-		next = current->next;
-		free_command(current);
-		free(current);
-		current = next;
+		tmp = cmd->next;
+		free_command(cmd);
+		free(cmd);
+		cmd = tmp;
 	}
 }

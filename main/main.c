@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:22:30 by barto             #+#    #+#             */
-/*   Updated: 2025/01/08 12:15:51 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/04 13:12:24 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-	
+
+int	g_signal_received = 0;
+
 void	handle_signal(int sig)
 {
 	g_signal_received = sig;
