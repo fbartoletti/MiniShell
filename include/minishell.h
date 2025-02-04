@@ -6,7 +6,7 @@
 /*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/04 13:12:38 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/04 15:01:28 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,9 +215,9 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 #endif
 
 /* TO DO LIST */
-//export 
-//pipe
-//exit con lettera mi deve uscire 
-//exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 1
-//heredoc
+//sistemare pipe
+//sistemare export
 //expander $
+//heredoc
+//exit con lettera mi deve uscire con 2
+//exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
