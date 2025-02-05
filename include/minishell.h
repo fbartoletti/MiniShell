@@ -6,7 +6,7 @@
 /*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/04 15:01:28 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/05 15:42:22 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,8 +216,10 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 
 /* TO DO LIST */
 //sistemare pipe
-//sistemare export
+//sistemare env e export mettere in ordine
 //expander $
 //heredoc
 //exit con lettera mi deve uscire con 2
 //exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
+//ridurre void	update_pwd_env(t_minishell *shell, const char *old_pwd)
+//ridurre righe int	ft_export_handle_arg(t_minishell *shell, char *arg)

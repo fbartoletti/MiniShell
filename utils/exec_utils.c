@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:38:15 by barto             #+#    #+#             */
-/*   Updated: 2025/01/07 12:50:12 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/05 14:05:20 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,4 +89,5 @@ void	free_array(char **array)
 		i++;
 	}
 	free(array);
+	array = NULL;
 }

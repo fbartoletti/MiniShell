@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:52:55 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 10:24:47 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/05 14:04:37 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,16 @@ char	*get_exit_status(t_minishell *shell)
 
 char	*handle_expansion(t_minishell *shell, char *str, int *i)
 {
+	char	*var_name;
+	char	*value;
+
 	if (str[*i + 1] == '?')
 	{
 		(*i)++;
 		return (get_exit_status(shell));
 	}
-	char *var_name = get_var_name(str, i);
-	char *value = get_env_value(shell->env, var_name);
+	var_name = get_var_name(str, i);
+	value = get_env_value(shell->env, var_name);
 	free(var_name);
 	return (value);
 }

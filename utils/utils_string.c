@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_string.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 12:21:27 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 12:35:48 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/05 15:29:29 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,5 @@ void add_new_env_var(t_minishell *shell, char *env_string)
 	}
 	new_env[i] = env_string;
 	new_env[i + 1] = NULL;
-	free_array(shell->env);
 	shell->env = new_env;
 }

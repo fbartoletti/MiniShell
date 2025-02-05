@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:55:16 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 12:34:02 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/05 15:41:39 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,12 @@ char	*get_env_var(char **env, const char *name)
 	return (NULL);
 }
 
-void	update_pwd_env(t_minishell *shell, const char *old_pwd)
+void update_pwd_env(t_minishell *shell, const char *old_pwd)
 {
 	char	*pwd;
 	char	*new_pwd;
 	char	*old_pwd_var;
+	char	*args[3];
 
 	pwd = getcwd(NULL, 0);
 	if (pwd)
@@ -42,20 +43,25 @@ void	update_pwd_env(t_minishell *shell, const char *old_pwd)
 		new_pwd = ft_strjoin("PWD=", pwd);
 		if (new_pwd)
 		{
-			char *args[] = {"export", new_pwd, NULL};
+			args[0] = "export";
+			args[1] = new_pwd;
+			args[2] = NULL;
 			ft_export(shell, args);
 			free(new_pwd);
 		}
 		old_pwd_var = ft_strjoin("OLDPWD=", old_pwd);
 		if (old_pwd_var)
 		{
-			char *args[] = {"export", old_pwd_var, NULL};
+			args[0] = "export";
+			args[1] = old_pwd_var;
+			args[2] = NULL;
 			ft_export(shell, args);
 			free(old_pwd_var);
 		}
 		free(pwd);
 	}
 }
+
 
 int ft_export_print_env(t_minishell *shell)
 {
@@ -86,16 +92,22 @@ int	ft_export_create_or_update_env(t_minishell *shell, char *name, char *env_str
 
 int	ft_export_handle_arg(t_minishell *shell, char *arg)
 {
-	char	*equals;
 	char	*name;
 	char	*value;
 	char	*env_string;
+	char	*equal_pos;
 
-	equals = ft_strchr(arg, '=');
-	if (!equals)
-		return (0);
-	name = ft_substr(arg, 0, equals - arg);
-	value = ft_strdup(equals + 1);
+	equal_pos = ft_strchr(arg, '=');
+	if (equal_pos)
+	{
+		name = ft_substr(arg, 0, equal_pos - arg);
+		value = ft_strdup(equal_pos + 1);
+	}
+	else
+	{
+		name = ft_strdup(arg);
+		value = ft_strdup("");
+	}
 	env_string = create_env_string(name, value);
 	if (!env_string)
 	{
@@ -108,3 +120,4 @@ int	ft_export_handle_arg(t_minishell *shell, char *arg)
 	free(value);
 	return (0);
 }
+

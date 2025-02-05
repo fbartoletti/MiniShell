@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:42:25 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 13:27:55 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/05 15:28:13 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int	ft_cd(t_minishell *shell, char **args)
 		free(path);
 		return 1;
 	}
-	return change_directory(absolute_path, path, old_pwd);
+	return (change_directory(absolute_path, path, old_pwd));
 }
 
 int	ft_pwd(t_minishell *shell, char **args)

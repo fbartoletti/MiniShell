@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:21 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 18:03:59 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/05 15:39:01 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,18 @@
 
 int	is_builtin(char *cmd)
 {
-	static const char *builtins[] = {
-		"echo", "cd", "pwd", "export", 
-		"unset", "env", "exit", NULL
-	};
-	int	i;
+	const char *builtins[8];
+    int i;
 
 	i = 0;
+    builtins[0] = "echo";
+    builtins[1] = "cd";
+    builtins[2] = "pwd";
+    builtins[3] = "export";
+    builtins[4] = "unset";
+    builtins[5] = "env";
+    builtins[6] = "exit";
+    builtins[7] = NULL;
 	while (builtins[i])
 	{
 		if (!ft_strcmp(cmd, builtins[i]))
