@@ -6,7 +6,7 @@
 /*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/05 15:42:22 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:21:01 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,10 +207,12 @@ void		restore_signals(void);
 void		free_redir(t_redir *redir);
 void		free_command(t_command *cmd);
 
-/* built_utils.c and cd_utils.c */
+/* built_utils.c and cd_utils.c and pwd_env */
 char		*get_env_var(char **env, const char *name);
 void		update_pwd_env(t_minishell *shell, const char *old_pwd);
 int			change_directory(char *absolute_path, char *path, char *old_pwd);
+void		export_env_var(t_minishell *shell, const char *var_name, const char *value);
+int			extract_name_value(char *arg, char **name, char **value);
 
 #endif
 
@@ -221,5 +223,3 @@ int			change_directory(char *absolute_path, char *path, char *old_pwd);
 //heredoc
 //exit con lettera mi deve uscire con 2
 //exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
-//ridurre void	update_pwd_env(t_minishell *shell, const char *old_pwd)
-//ridurre righe int	ft_export_handle_arg(t_minishell *shell, char *arg)

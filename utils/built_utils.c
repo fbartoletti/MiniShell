@@ -6,7 +6,7 @@
 /*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:55:16 by barto             #+#    #+#             */
-/*   Updated: 2025/02/05 15:41:39 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/05 18:20:28 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,39 +29,6 @@ char	*get_env_var(char **env, const char *name)
 	}
 	return (NULL);
 }
-
-void update_pwd_env(t_minishell *shell, const char *old_pwd)
-{
-	char	*pwd;
-	char	*new_pwd;
-	char	*old_pwd_var;
-	char	*args[3];
-
-	pwd = getcwd(NULL, 0);
-	if (pwd)
-	{
-		new_pwd = ft_strjoin("PWD=", pwd);
-		if (new_pwd)
-		{
-			args[0] = "export";
-			args[1] = new_pwd;
-			args[2] = NULL;
-			ft_export(shell, args);
-			free(new_pwd);
-		}
-		old_pwd_var = ft_strjoin("OLDPWD=", old_pwd);
-		if (old_pwd_var)
-		{
-			args[0] = "export";
-			args[1] = old_pwd_var;
-			args[2] = NULL;
-			ft_export(shell, args);
-			free(old_pwd_var);
-		}
-		free(pwd);
-	}
-}
-
 
 int ft_export_print_env(t_minishell *shell)
 {
@@ -95,19 +62,9 @@ int	ft_export_handle_arg(t_minishell *shell, char *arg)
 	char	*name;
 	char	*value;
 	char	*env_string;
-	char	*equal_pos;
 
-	equal_pos = ft_strchr(arg, '=');
-	if (equal_pos)
-	{
-		name = ft_substr(arg, 0, equal_pos - arg);
-		value = ft_strdup(equal_pos + 1);
-	}
-	else
-	{
-		name = ft_strdup(arg);
-		value = ft_strdup("");
-	}
+	if (extract_name_value(arg, &name, &value))
+		return (1);
 	env_string = create_env_string(name, value);
 	if (!env_string)
 	{
@@ -121,3 +78,20 @@ int	ft_export_handle_arg(t_minishell *shell, char *arg)
 	return (0);
 }
 
+int	extract_name_value(char *arg, char **name, char **value)
+{
+	char	*equal_pos;
+
+	equal_pos = ft_strchr(arg, '=');
+	if (equal_pos)
+	{
+		*name = ft_substr(arg, 0, equal_pos - arg);
+		*value = ft_strdup(equal_pos + 1);
+	}
+	else
+	{
+		*name = ft_strdup(arg);
+		*value = ft_strdup("");
+	}
+	return (*name && *value) ? 0 : 1;
+}
