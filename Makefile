@@ -24,6 +24,7 @@ SRCS = main/main.c \
        utils/built_utils.c \
        utils/cd_utils.c \
        utils/pwd_env.c\
+       utils/builtin_util.c \
        executor/exec.c \
        executor/exe.c \
        executor/executor.c \

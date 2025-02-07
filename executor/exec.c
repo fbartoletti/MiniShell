@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:21 by barto             #+#    #+#             */
-/*   Updated: 2025/02/05 15:39:01 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/07 15:19:12 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void	execute_external(t_minishell *shell, t_command *cmd)
 	check_command_path(cmd_path, cmd->args[0]);
 	if (execve(cmd_path, cmd->args, shell->env) == -1)
 	{
-		free(cmd_path);
 		handle_command_error(cmd->args[0]);
 		exit(126);
 	}

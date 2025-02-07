@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:59:15 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 10:42:12 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/07 15:52:06 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ int	ft_env(t_minishell *shell, char **args)
 	i = 0;
 	while (shell->env[i])
 	{
-		printf("%s\n", shell->env[i]);
+		if (ft_strchr(shell->env[i], '='))
+			ft_putendl_fd(shell->env[i], 1);
 		i++;
 	}
 	return (0);

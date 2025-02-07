@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:55:16 by barto             #+#    #+#             */
-/*   Updated: 2025/02/05 18:20:28 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/07 15:57:43 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,32 @@ char	*get_env_var(char **env, const char *name)
 	return (NULL);
 }
 
-int ft_export_print_env(t_minishell *shell)
+int	ft_export_print_env(t_minishell *shell)
 {
-	int i;
+	char	**sorted_env;
+	int		env_size;
+	int		i;
 
+	env_size = 0;
+	while (shell->env[env_size])
+		env_size++;
+	sorted_env = (char **)safe_malloc(sizeof(char *) * (env_size + 1));
 	i = 0;
-	while (shell->env[i])
-		printf("declare -x %s\n", shell->env[i++]);
+	while (i < env_size)
+	{
+		sorted_env[i] = ft_strdup(shell->env[i]);
+		i++;
+	}
+	sorted_env[env_size] = NULL;
+	sort_env_array(sorted_env, env_size);
+	i = 0;
+	while (sorted_env[i])
+	{
+		print_export_var(sorted_env[i]);
+		free(sorted_env[i]);
+		i++;
+	}
+	free(sorted_env);
 	return (0);
 }
 
@@ -65,6 +84,21 @@ int	ft_export_handle_arg(t_minishell *shell, char *arg)
 
 	if (extract_name_value(arg, &name, &value))
 		return (1);
+	if (!is_valid_identifier(name))
+	{
+		print_error("export: not a valid identifier");
+		free(name);
+		free(value);
+		return (1);
+	}
+	if (!ft_strchr(arg, '='))
+	{
+		if (find_env_index(shell->env, name) == -1)
+			add_new_env_var(shell, ft_strdup(name));
+		free(name);
+		free(value);
+		return (0);
+	}
 	env_string = create_env_string(name, value);
 	if (!env_string)
 	{
