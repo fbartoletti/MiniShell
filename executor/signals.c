@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:36:43 by barto             #+#    #+#             */
-/*   Updated: 2025/01/08 12:16:00 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 11:48:54 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int	execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec)
 {
 	if (!cmd->args || !cmd->args[0])
 		return (0);
+	expand_command_args(shell, cmd);
 	if (is_builtin(cmd->args[0]) && !cmd->next)
 		return (execute_builtin(shell, cmd));
 	handle_parent_signals();
@@ -26,15 +27,7 @@ int	execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec)
 		return (-1);
 	}
 	if (exec->pid == 0)
-	{
-		handle_child_signals();
-		setup_pipes(exec);
-		handle_redirections(cmd);
-		
-		if (is_builtin(cmd->args[0]))
-			exit(execute_builtin(shell, cmd));
-		execute_external(shell, cmd);
-	}
+		execute_child_process(shell, cmd, exec);
 	restore_signals();
 	return (0);
 }

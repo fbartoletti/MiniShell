@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 11:17:31 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 11:54:41 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ int			parse_token(t_minishell *shell, t_token *token, t_command *cmd);
 t_redir		*create_redirection(t_token_type type, char *file);
 void		add_redir_to_cmd(t_command *cmd, t_redir *redir);
 
-/* expander.c and expander_utils.c */
+/* expander.c and expander_utils.c and expand_utils.c*/
 char		*expand_variables(t_minishell *shell, char *str);
 char		*get_env_value(char **env, char *key);
 char		*get_exit_status(t_minishell *shell);
@@ -134,6 +134,9 @@ char		*expand_var(t_minishell *shell, char *str, int *i, char *result);
 char		*append_char(char *str, char c);
 char		*handle_expansion(t_minishell *shell, char *str, int *i);
 char		*expand_env_var(t_minishell *shell, char *str, int *i);
+int			expand_command_args(t_minishell *shell, t_command *cmd);
+int			execute_child_process(t_minishell *shell, t_command *cmd,
+	t_executor *exec);
 
 /* quote_handler.c and quote_handler_utils.c */
 char		*handle_quotes(t_minishell *shell, char *str);
@@ -216,14 +219,12 @@ int			extract_name_value(char *arg, char **name, char **value);
 void		sort_env_array(char **env, int size);
 void		print_export_var(char *var);
 int			is_valid_identifier(const char *name);
-
-int	handle_error(char *name, char *value);
-int	handle_no_equal(t_minishell *shell, char *name, char *value);
+int			handle_error(char *name, char *value);
+int			handle_no_equal(t_minishell *shell, char *name, char *value);
 #endif
 
 /* TO DO LIST */
 //sistemare pipe
-//expander $
 //heredoc
 
 //exit con lettera mi deve uscire con 2
