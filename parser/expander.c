@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:52:55 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 11:46:07 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 12:12:31 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,20 +75,19 @@ char	*expand_variables(t_minishell *shell, char *str)
 {
 	char	*result;
 	int		i;
-	int		in_single_quotes;
 	
 	if (!str)
 		return (NULL);
+	if (str[0] == '\1')
+		return (ft_strdup(str + 1));
+	
 	result = ft_strdup("");
 	if (!result)
 		return (NULL);
 	i = 0;
-	in_single_quotes = 0;
 	while (str && str[i])
 	{
-		if (str[i] == '\'')
-			in_single_quotes = !in_single_quotes;
-		else if (str[i] == '$' && !in_single_quotes)
+		if (str[i] == '$')
 			result = expand_var(shell, str, &i, result);
 		else
 			result = append_char(result, str[i]);

@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 11:54:41 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 12:18:28 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ char		*expand_env_var(t_minishell *shell, char *str, int *i);
 int			expand_command_args(t_minishell *shell, t_command *cmd);
 int			execute_child_process(t_minishell *shell, t_command *cmd,
 	t_executor *exec);
+char		*create_quoted_value(char *value, char quote);
 
 /* quote_handler.c and quote_handler_utils.c */
 char		*handle_quotes(t_minishell *shell, char *str);

@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 12:23:21 by barto             #+#    #+#             */
-/*   Updated: 2025/01/04 16:28:25 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 12:14:29 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,24 @@
 int	handle_quote(char *input, int *i, char quote, t_token **tokens)
 {
 	int		start;
-	int		j;
+	int		len;
 	char	*value;
-	
-	start = *i + 1;
-	j = start;
-	while (input[j] && input[j] != quote)
-		j++;
-	if (!input[j])
-		return (print_error(ERR_QUOTE), 0);
-	value = ft_substr(input, start, j - start);
+
+	(*i)++;
+	start = *i;
+	while (input[*i] && input[*i] != quote)
+		(*i)++;
+	if (!input[*i])
+		return (0);
+	len = *i - start;
+	value = ft_substr(input, start, len);
+	if (!value)
+		return (0);
+	value = create_quoted_value(value, quote);
+	if (!value)
+		return (0);
 	add_token(tokens, create_token(TOKEN_WORD, value));
-	*i = j + 1;
+	(*i)++;
 	return (1);
 }
 
