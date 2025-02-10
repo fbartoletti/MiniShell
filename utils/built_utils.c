@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 11:55:16 by barto             #+#    #+#             */
-/*   Updated: 2025/02/07 15:57:43 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 11:13:43 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,20 +85,9 @@ int	ft_export_handle_arg(t_minishell *shell, char *arg)
 	if (extract_name_value(arg, &name, &value))
 		return (1);
 	if (!is_valid_identifier(name))
-	{
-		print_error("export: not a valid identifier");
-		free(name);
-		free(value);
-		return (1);
-	}
+		return (handle_error(name, value));
 	if (!ft_strchr(arg, '='))
-	{
-		if (find_env_index(shell->env, name) == -1)
-			add_new_env_var(shell, ft_strdup(name));
-		free(name);
-		free(value);
-		return (0);
-	}
+		return (handle_no_equal(shell, name, value));
 	env_string = create_env_string(name, value);
 	if (!env_string)
 	{

@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/07 16:02:02 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 11:15:10 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,8 @@ void		sort_env_array(char **env, int size);
 void		print_export_var(char *var);
 int			is_valid_identifier(const char *name);
 
+int	handle_error(char *name, char *value);
+int	handle_no_equal(t_minishell *shell, char *name, char *value);
 #endif
 
 /* TO DO LIST */
