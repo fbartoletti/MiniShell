@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:38:15 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 14:48:37 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 16:12:19 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,4 +96,24 @@ void	free_array(char **array)
 	}
 	free(array);
 	array = NULL;
+}
+
+int	handle_heredoc(t_redir *redir, t_minishell *shell)
+{
+	char	*content;
+	int		pipe_fd[2];
+
+	if (pipe(pipe_fd) < 0)
+		return (-1);
+	content = read_heredoc_input(redir->file, shell);
+	if (!content)
+	{
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		return (-1);
+	}
+	write(pipe_fd[1], content, ft_strlen(content));
+	free(content);
+	close(pipe_fd[1]);
+	return (pipe_fd[0]);
 }

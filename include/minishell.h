@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 15:54:44 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 16:15:54 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,6 @@ void		setup_pipes(t_executor *exec);
 int			is_builtin(char *cmd);
 int			execute_builtin(t_minishell *shell, t_command *cmd);
 void		free_array(char **array);
-int			handle_heredoc(t_redir *redir, t_minishell *shell);
 int			execute_commands(t_minishell *shell);
 void		execute_external(t_minishell *shell, t_command *cmd);
 int			execute_commands(t_minishell *shell);
@@ -187,6 +186,9 @@ int			setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_st
 	t_minishell *shell);
 char		*append_line_to_content(char *content, char *line);
 int			execute_builtin_command(t_minishell *shell, t_command *cmd);
+int			handle_heredoc_token(char *input, int *i, t_token **tokens);
+char		*read_heredoc_input(char *delimiter, t_minishell *shell);
+int			handle_heredoc(t_redir *redir, t_minishell *shell);
 
 /* builtin.c and builtin_utils.c */
 int			ft_echo(t_minishell *shell, char **args);
@@ -233,3 +235,4 @@ int			handle_no_equal(t_minishell *shell, char *name, char *value);
 
 //exit con lettera mi deve uscire con 2
 //exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
+//accorcia read_heredoc_input

@@ -6,28 +6,43 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:13:44 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 14:43:38 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 16:15:37 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static char	*read_heredoc_input(char *delimiter, t_minishell *shell)
+char	*read_heredoc_input(char *delimiter, t_minishell *shell)
 {
 	char	*line;
 	char	*content;
+	char	*expanded;
+	int		quote_mode;
 
 	content = ft_strdup("");
 	if (!content)
 		return (NULL);
 	shell->in_heredoc = 1;
+	quote_mode = 0;
+	if (delimiter[0] == '\'')
+	{
+		quote_mode = 1;
+		delimiter++;
+		delimiter[ft_strlen(delimiter) - 1] = '\0';
+	}
 	while (1)
 	{
 		line = readline("> ");
 		if (!line || ft_strcmp(line, delimiter) == 0)
 		{
 			free(line);
-			break ;
+			break;
+		}
+		if (!quote_mode && ft_strchr(line, '$'))
+		{
+			expanded = expand_variables(shell, line);
+			free(line);
+			line = expanded;
 		}
 		content = append_line_to_content(content, line);
 		free(line);
@@ -38,24 +53,21 @@ static char	*read_heredoc_input(char *delimiter, t_minishell *shell)
 	return (content);
 }
 
-int	handle_heredoc(t_redir *redir, t_minishell *shell)
+int	handle_heredoc_token(char *input, int *i, t_token **tokens)
 {
-	char	*content;
-	int		pipe_fd[2];
+	int		start;
+	char	*value;
 
-	if (pipe(pipe_fd) < 0)
-		return (-1);
-	content = read_heredoc_input(redir->file, shell);
-	if (!content)
-	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		return (-1);
-	}
-	write(pipe_fd[1], content, ft_strlen(content));
-	free(content);
-	close(pipe_fd[1]);
-	return (pipe_fd[0]);
+	(*i) += 2;
+	while (input[*i] && is_whitespace(input[*i]))
+		(*i)++;
+	start = *i;
+	while (input[*i] && !is_whitespace(input[*i]))
+		(*i)++;
+	value = ft_substr(input, start, *i - start);
+	add_token(tokens, create_token(TOKEN_HEREDOC, value));
+	
+	return (1);
 }
 
 void	handle_command_error(char *cmd)
@@ -74,7 +86,6 @@ void	handle_command_error(char *cmd)
 	}
 	else
 		error = "no such file or directory";
-	
 	ft_putstr_fd("minishell: ", 2);
 	ft_putstr_fd(cmd, 2);
 	ft_putstr_fd(": ", 2);
