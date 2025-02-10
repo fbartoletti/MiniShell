@@ -6,48 +6,46 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:13:44 by barto             #+#    #+#             */
-/*   Updated: 2025/01/07 13:14:05 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 14:43:38 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-static char	*read_heredoc_input(char *delimiter)
+static char	*read_heredoc_input(char *delimiter, t_minishell *shell)
 {
 	char	*line;
 	char	*content;
-	char	*temp;
 
 	content = ft_strdup("");
+	if (!content)
+		return (NULL);
+	shell->in_heredoc = 1;
 	while (1)
 	{
 		line = readline("> ");
-		if (!line)
-			break;
-		if (ft_strcmp(line, delimiter) == 0)
+		if (!line || ft_strcmp(line, delimiter) == 0)
 		{
 			free(line);
-			break;
+			break ;
 		}
-		temp = content;
-		content = ft_strjoin(content, line);
-		free(temp);
-		temp = content;
-		content = ft_strjoin(content, "\n");
-		free(temp);
+		content = append_line_to_content(content, line);
 		free(line);
+		if (!content)
+			return (NULL);
 	}
+	shell->in_heredoc = 0;
 	return (content);
 }
 
-int	handle_heredoc(t_redir *redir)
+int	handle_heredoc(t_redir *redir, t_minishell *shell)
 {
 	char	*content;
 	int		pipe_fd[2];
-	
+
 	if (pipe(pipe_fd) < 0)
 		return (-1);
-	content = read_heredoc_input(redir->file);
+	content = read_heredoc_input(redir->file, shell);
 	if (!content)
 	{
 		close(pipe_fd[0]);
@@ -90,4 +88,20 @@ void check_command_path(char *cmd_path, char *cmd)
 		handle_command_error(cmd);
 		exit(127);
 	}
+}
+
+char	*append_line_to_content(char *content, char *line)
+{
+	char	*temp;
+	char	*new_content;
+
+	temp = content;
+	new_content = ft_strjoin(content, line);
+	free(temp);
+	if (!new_content)
+		return (NULL);
+	temp = new_content;
+	new_content = ft_strjoin(new_content, "\n");
+	free(temp);
+	return (new_content);
 }

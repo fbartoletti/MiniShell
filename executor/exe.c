@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:22:32 by barto             #+#    #+#             */
-/*   Updated: 2025/01/08 12:04:33 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 15:36:35 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,34 +52,57 @@ void	wait_all_processes(t_minishell *shell, t_command *cmd)
 	}
 }
 
-int	setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout)
+int	setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout,
+	t_minishell *shell)
 {
 	t_redir	*redir;
-	
+
 	*saved_stdin = dup(STDIN_FILENO);
 	*saved_stdout = dup(STDOUT_FILENO);
-	if (*saved_stdin == -1 || *saved_stdout == -1)
-		return (0);
+	if (*saved_stdin < 0 || *saved_stdout < 0)
+		return (-1);
 	redir = cmd->redirs;
 	while (redir)
 	{
-		if (setup_redirection(redir) < 0)
+		if (setup_redirection(redir, shell) < 0)
 		{
-			dup2(*saved_stdin, STDIN_FILENO);
-			dup2(*saved_stdout, STDOUT_FILENO);
-			close(*saved_stdin);
-			close(*saved_stdout);
-			return (0);
+			restore_redirections(*saved_stdin, *saved_stdout);
+			return (-1);
 		}
 		redir = redir->next;
 	}
-	return (1);
+	return (0);
 }
 
 void	restore_redirections(int saved_stdin, int saved_stdout)
 {
-	dup2(saved_stdin, STDIN_FILENO);
-	dup2(saved_stdout, STDOUT_FILENO);
-	close(saved_stdin);
-	close(saved_stdout);
+	if (saved_stdin >= 0)
+	{
+		dup2(saved_stdin, STDIN_FILENO);
+		close(saved_stdin);
+	}
+	if (saved_stdout >= 0)
+	{
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(saved_stdout);
+	}
+}
+
+int	execute_builtin_command(t_minishell *shell, t_command *cmd)
+{
+	if (!ft_strcmp(cmd->args[0], "echo"))
+		return (ft_echo(shell, cmd->args));
+	if (!ft_strcmp(cmd->args[0], "cd"))
+		return (ft_cd(shell, cmd->args));
+	if (!ft_strcmp(cmd->args[0], "pwd"))
+		return (ft_pwd(shell, cmd->args));
+	if (!ft_strcmp(cmd->args[0], "export"))
+		return (ft_export(shell, cmd->args));
+	if (!ft_strcmp(cmd->args[0], "unset"))
+		return (ft_unset(shell, cmd->args));
+	if (!ft_strcmp(cmd->args[0], "env"))
+		return (ft_env(shell, cmd->args));
+	if (!ft_strcmp(cmd->args[0], "exit"))
+		return (ft_exit(shell, cmd->args));
+	return (1);
 }

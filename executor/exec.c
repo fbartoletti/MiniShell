@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:21 by barto             #+#    #+#             */
-/*   Updated: 2025/02/07 15:19:12 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 15:36:13 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,34 +72,25 @@ int	execute_builtin(t_minishell *shell, t_command *cmd)
 	int	saved_stdout;
 	int	ret;
 
-	if (!setup_builtin_redirections(cmd, &saved_stdin, &saved_stdout))
-		return (1);
-	if (!ft_strcmp(cmd->args[0], "echo"))
-		ret = ft_echo(shell, cmd->args);
-	else if (!ft_strcmp(cmd->args[0], "cd"))
-		ret = ft_cd(shell, cmd->args);
-	else if (!ft_strcmp(cmd->args[0], "pwd"))
-		ret = ft_pwd(shell, cmd->args);
-	else if (!ft_strcmp(cmd->args[0], "export"))
-		ret = ft_export(shell, cmd->args);
-	else if (!ft_strcmp(cmd->args[0], "unset"))
-		ret = ft_unset(shell, cmd->args);
-	else if (!ft_strcmp(cmd->args[0], "env"))
-		ret = ft_env(shell, cmd->args);
-	else
-		ret = ft_exit(shell, cmd->args);
-	restore_redirections(saved_stdin, saved_stdout);
+	if (cmd->redirs)
+	{
+		if (setup_builtin_redirections(cmd, &saved_stdin, &saved_stdout, shell) < 0)
+			return (1);
+	}
+	ret = execute_builtin_command(shell, cmd);
+	if (cmd->redirs)
+		restore_redirections(saved_stdin, saved_stdout);
 	return (ret);
 }
 
-void	handle_redirections(t_command *cmd)
+void	handle_redirections(t_command *cmd, t_minishell *shell)
 {
 	t_redir	*redir;
 
 	redir = cmd->redirs;
 	while (redir)
 	{
-		if (setup_redirection(redir) < 0)
+		if (setup_redirection(redir, shell) < 0)
 			exit(1);
 		redir = redir->next;
 	}
