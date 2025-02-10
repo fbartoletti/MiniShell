@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 11:15:10 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/10 11:17:31 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,6 +226,5 @@ int	handle_no_equal(t_minishell *shell, char *name, char *value);
 //expander $
 //heredoc
 
-//ridurre ft_export_handle_arg
 //exit con lettera mi deve uscire con 2
 //exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
