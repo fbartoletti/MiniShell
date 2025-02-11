@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 16:15:54 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/11 14:35:50 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,137 +96,140 @@ typedef struct s_builtin
 } t_builtin;
 
 /* main.c and main_utils.c */
-void		handle_signal(int sig);
-void		init_minishell(t_minishell *shell, char **env);
-int			main(int ac, char **av, char **env);
-int			check_basic_syntax(char *line);
-int			validate_and_tokenize(t_minishell *shell, char *line);
-void		cleanup_process(t_minishell *shell);
+void			handle_signal(int sig);
+void			init_minishell(t_minishell *shell, char **env);
+int				main(int ac, char **av, char **env);
+int				check_basic_syntax(char *line);
+int				validate_and_tokenize(t_minishell *shell, char *line);
+void			cleanup_process(t_minishell *shell);
 
-/* lexer.c and lexer_utils.c */
-t_token		*tokenize(char *input);
-t_token		*create_token(t_token_type type, char *value);
-void		add_token(t_token **tokens, t_token *new);
-int			is_special_char(char c);
-int			is_whitespace(char c);
-int			handle_quote(char *input, int *i, char quote, t_token **tokens);
-int			handle_special(char *input, int *i, t_token **tokens);
-int			handle_word(char *input, int *i, t_token **tokens);
+/* lexer.c and lexer_utils.c and token_utils.c */
+t_token			*tokenize(char *input);
+t_token			*create_token(t_token_type type, char *value);
+void			add_token(t_token **tokens, t_token *new);
+int				is_special_char(char c);
+int				is_whitespace(char c);
+int				handle_quote(char *input, int *i, char quote, t_token **tokens);
+int				handle_special(char *input, int *i, t_token **tokens);
+int				handle_word(char *input, int *i, t_token **tokens);
+t_token_type	get_token_type(char *input, int i, int *len);
+int				create_special_token(t_token **tokens, char *value, t_token_type type);
+int				handle_heredoc_delimiter(char *input, int *i, t_token **tokens);
 
 /* parser.c and parsing.c and parser_utils.c */
-int			parse_command(t_minishell *shell);
-t_command	*create_command(void);
-void		add_command(t_command **commands, t_command *new);
-int			is_redir_token(t_token_type type);
-void		handle_redirection(t_command *cmd, t_token *token);
-void		free_command_content(t_command *cmd);
-void		add_command_to_shell(t_minishell *shell, t_command *cmd);
-int			parse_token(t_minishell *shell, t_token *token, t_command *cmd);
-t_redir		*create_redirection(t_token_type type, char *file);
-void		add_redir_to_cmd(t_command *cmd, t_redir *redir);
+int				parse_command(t_minishell *shell);
+t_command		*create_command(void);
+void			add_command(t_command **commands, t_command *new);
+int				is_redir_token(t_token_type type);
+void			handle_redirection(t_command *cmd, t_token *token);
+void			free_command_content(t_command *cmd);
+void			add_command_to_shell(t_minishell *shell, t_command *cmd);
+int				parse_token(t_minishell *shell, t_token *token, t_command *cmd);
+t_redir			*create_redirection(t_token_type type, char *file);
+void			add_redir_to_cmd(t_command *cmd, t_redir *redir);
 
 /* expander.c and expander_utils.c and expand_utils.c*/
-char		*expand_variables(t_minishell *shell, char *str);
-char		*get_env_value(char **env, char *key);
-char		*get_exit_status(t_minishell *shell);
-char		*get_var_name(char *str, int *i);
-char		*expand_var(t_minishell *shell, char *str, int *i, char *result);
-char		*append_char(char *str, char c);
-char		*handle_expansion(t_minishell *shell, char *str, int *i);
-char		*expand_env_var(t_minishell *shell, char *str, int *i);
-int			expand_command_args(t_minishell *shell, t_command *cmd);
-void		execute_child_process(t_minishell *shell, t_command *cmd,
+char			*expand_variables(t_minishell *shell, char *str);
+char			*get_env_value(char **env, char *key);
+char			*get_exit_status(t_minishell *shell);
+char			*get_var_name(char *str, int *i);
+char			*expand_var(t_minishell *shell, char *str, int *i, char *result);
+char			*append_char(char *str, char c);
+char			*handle_expansion(t_minishell *shell, char *str, int *i);
+char			*expand_env_var(t_minishell *shell, char *str, int *i);
+int				expand_command_args(t_minishell *shell, t_command *cmd);
+void			execute_child_process(t_minishell *shell, t_command *cmd,
 	t_executor *exec);
-char		*create_quoted_value(char *value, char quote);
+char			*create_quoted_value(char *value, char quote);
 
 /* quote_handler.c and quote_handler_utils.c */
-char		*handle_quotes(t_minishell *shell, char *str);
-char 		*handle_quote_single(char *str, int *i, char *result);
-char		*handle_quote_double(t_minishell *shell, char *str, int *i, char *result);
-char		*extract_single_quote(char *str, int *i);
-char		*extract_double_quote(t_minishell *shell, char *str, int *i);
+char			*handle_quotes(t_minishell *shell, char *str);
+char 			*handle_quote_single(char *str, int *i, char *result);
+char			*handle_quote_double(t_minishell *shell, char *str, int *i, char *result);
+char			*extract_single_quote(char *str, int *i);
+char			*extract_double_quote(t_minishell *shell, char *str, int *i);
 
 /* utils.c */
-void		*safe_malloc(size_t size);
-void		error_exit(char *msg);
-void		print_error(char *msg);
-void		free_tokens(t_token *tokens);
-void		free_commands(t_command *cmd);
+void			*safe_malloc(size_t size);
+void			error_exit(char *msg);
+void			print_error(char *msg);
+void			free_tokens(t_token *tokens);
+void			free_commands(t_command *cmd);
 
 /* utils_string.c */
-char		*ft_strdup(const char *s);
-size_t		ft_strlen(const char *s);
-char		*ft_strcpy(char *dest, const char *src);
-int			ft_strcmp(const char *s1, const char *s2);
-size_t		ft_strlcpy(char *dst, const char *src, size_t size);
-char		*ft_strjoin(const char *s1, const char *s2);
-int			ft_strncmp(const char *s1, const char *s2, size_t n);
+char			*ft_strdup(const char *s);
+size_t			ft_strlen(const char *s);
+char			*ft_strcpy(char *dest, const char *src);
+int				ft_strcmp(const char *s1, const char *s2);
+size_t			ft_strlcpy(char *dst, const char *src, size_t size);
+char			*ft_strjoin(const char *s1, const char *s2);
+int				ft_strncmp(const char *s1, const char *s2, size_t n);
 
 /* art.c */
-void		art(void);
+void			art(void);
 
 /* exec.c and exec_utils.c and exe_utils.c and exe.c and executor.c */
-char		*find_command_path(t_minishell *shell, char *cmd);
-int			setup_redirection(t_redir *redir, t_minishell *shell);
-void		handle_redirections(t_command *cmd, t_minishell *shell);
-void		setup_pipes(t_executor *exec);
-int			is_builtin(char *cmd);
-int			execute_builtin(t_minishell *shell, t_command *cmd);
-void		free_array(char **array);
-int			execute_commands(t_minishell *shell);
-void		execute_external(t_minishell *shell, t_command *cmd);
-int			execute_commands(t_minishell *shell);
-void		init_executor(t_executor *exec);
-void		close_pipes(t_executor *exec);
-void		wait_all_processes(t_minishell *shell, t_command *cmd);
-void 		check_command_path(char *cmd_path, char *cmd);
-void		handle_command_error(char *cmd);
-void		restore_redirections(int saved_stdin, int saved_stdout);
-int			setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout,
+char			*find_command_path(t_minishell *shell, char *cmd);
+int				setup_redirection(t_redir *redir, t_minishell *shell);
+void			handle_redirections(t_command *cmd, t_minishell *shell);
+void			setup_pipes(t_executor *exec);
+int				is_builtin(char *cmd);
+int				execute_builtin(t_minishell *shell, t_command *cmd);
+void			free_array(char **array);
+int				execute_commands(t_minishell *shell);
+void			execute_external(t_minishell *shell, t_command *cmd);
+int				execute_commands(t_minishell *shell);
+void			init_executor(t_executor *exec);
+void			close_pipes(t_executor *exec);
+void			wait_all_processes(t_minishell *shell, t_command *cmd);
+void 			check_command_path(char *cmd_path, char *cmd);
+void			handle_command_error(char *cmd);
+void			restore_redirections(int saved_stdin, int saved_stdout);
+int				setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout,
 	t_minishell *shell);
-char		*append_line_to_content(char *content, char *line);
-int			execute_builtin_command(t_minishell *shell, t_command *cmd);
-int			handle_heredoc_token(char *input, int *i, t_token **tokens);
-char		*read_heredoc_input(char *delimiter, t_minishell *shell);
-int			handle_heredoc(t_redir *redir, t_minishell *shell);
+char			*append_line_to_content(char *content, char *line);
+int				execute_builtin_command(t_minishell *shell, t_command *cmd);
+int				handle_heredoc_token(char *input, int *i, t_token **tokens);
+char			*read_heredoc_input(char *delimiter, t_minishell *shell);
+int				handle_heredoc(t_redir *redir, t_minishell *shell);
 
 /* builtin.c and builtin_utils.c */
-int			ft_echo(t_minishell *shell, char **args);
-int			ft_cd(t_minishell *shell, char **args);
-int			ft_cd_handle_path(t_minishell *shell, char **args, char **path, char **old_pwd);
-int			ft_pwd(t_minishell *shell, char **args);
-int			ft_exit(t_minishell *shell, char **args);
-int			ft_export(t_minishell *shell, char **args);
-int			ft_unset(t_minishell *shell, char **args);
-int			ft_env(t_minishell *shell, char **args);
-int 		ft_export_print_env(t_minishell *shell);
-int			ft_export_create_or_update_env(t_minishell *shell, char *name, char *env_string);
-int			ft_export_handle_arg(t_minishell *shell, char *arg);
-char		*create_env_string(char *name, char *value);
-int			find_env_index(char **env, char *name);
-void 		add_new_env_var(t_minishell *shell, char *env_string);
+int				ft_echo(t_minishell *shell, char **args);
+int				ft_cd(t_minishell *shell, char **args);
+int				ft_cd_handle_path(t_minishell *shell, char **args, char **path, char **old_pwd);
+int				ft_pwd(t_minishell *shell, char **args);
+int				ft_exit(t_minishell *shell, char **args);
+int				ft_export(t_minishell *shell, char **args);
+int				ft_unset(t_minishell *shell, char **args);
+int				ft_env(t_minishell *shell, char **args);
+int 			ft_export_print_env(t_minishell *shell);
+int				ft_export_create_or_update_env(t_minishell *shell, char *name, char *env_string);
+int				ft_export_handle_arg(t_minishell *shell, char *arg);
+char			*create_env_string(char *name, char *value);
+int				find_env_index(char **env, char *name);
+void 			add_new_env_var(t_minishell *shell, char *env_string);
 
 /* signals.c */
-int			execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec);
-void		handle_child_signals(void);
-void		handle_parent_signals(void);
-void		restore_signals(void);
+int				execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec);
+void			handle_child_signals(void);
+void			handle_parent_signals(void);
+void			restore_signals(void);
 
 /* clean.c */
-void		free_redir(t_redir *redir);
-void		free_command(t_command *cmd);
+void			free_redir(t_redir *redir);
+void			free_command(t_command *cmd);
 
 /* built_utils.c and cd_utils.c and pwd_env and builtin_util.c */
-char		*get_env_var(char **env, const char *name);
-void		update_pwd_env(t_minishell *shell, const char *old_pwd);
-int			change_directory(char *absolute_path, char *path, char *old_pwd);
-void		export_env_var(t_minishell *shell, const char *var_name, const char *value);
-int			extract_name_value(char *arg, char **name, char **value);
-void		sort_env_array(char **env, int size);
-void		print_export_var(char *var);
-int			is_valid_identifier(const char *name);
-int			handle_error(char *name, char *value);
-int			handle_no_equal(t_minishell *shell, char *name, char *value);
+char			*get_env_var(char **env, const char *name);
+void			update_pwd_env(t_minishell *shell, const char *old_pwd);
+int				change_directory(char *absolute_path, char *path, char *old_pwd);
+void			export_env_var(t_minishell *shell, const char *var_name, const char *value);
+int				extract_name_value(char *arg, char **name, char **value);
+void			sort_env_array(char **env, int size);
+void			print_export_var(char *var);
+int				is_valid_identifier(const char *name);
+int				handle_error(char *name, char *value);
+int				handle_no_equal(t_minishell *shell, char *name, char *value);
 
 #endif
 

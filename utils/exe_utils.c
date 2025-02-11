@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:13:44 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 16:15:37 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/11 14:24:40 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,27 @@ char	*read_heredoc_input(char *delimiter, t_minishell *shell)
 	char	*content;
 	char	*expanded;
 	int		quote_mode;
+	char	*real_delimiter;
 
 	content = ft_strdup("");
 	if (!content)
 		return (NULL);
 	shell->in_heredoc = 1;
 	quote_mode = 0;
-	if (delimiter[0] == '\'')
+	real_delimiter = delimiter;
+
+	// Se il delimitatore ha quote, rimuovile per il confronto
+	if (delimiter[0] == '\'' && delimiter[ft_strlen(delimiter) - 1] == '\'')
 	{
+		printf("quote mode\n");
 		quote_mode = 1;
-		delimiter++;
-		delimiter[ft_strlen(delimiter) - 1] = '\0';
+		real_delimiter = ft_strtrim(delimiter, "'");
 	}
+
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || ft_strcmp(line, delimiter) == 0)
+		if (!line || ft_strcmp(line, real_delimiter) == 0)  // Usa real_delimiter qui
 		{
 			free(line);
 			break;
@@ -47,8 +52,14 @@ char	*read_heredoc_input(char *delimiter, t_minishell *shell)
 		content = append_line_to_content(content, line);
 		free(line);
 		if (!content)
+		{
+			if (quote_mode)
+				free(real_delimiter);
 			return (NULL);
+		}
 	}
+	if (quote_mode)
+		free(real_delimiter);
 	shell->in_heredoc = 0;
 	return (content);
 }

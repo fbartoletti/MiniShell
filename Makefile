@@ -27,6 +27,7 @@ SRCS = main/main.c \
        utils/builtin_util.c \
        utils/handle_utils.c \
        utils/expand_utils.c \
+       utils/token_utils.c \
        executor/exec.c \
        executor/exe.c \
        executor/executor.c \

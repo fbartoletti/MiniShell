@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 12:23:21 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 12:14:29 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/11 14:35:05 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,29 +38,21 @@ int	handle_quote(char *input, int *i, char quote, t_token **tokens)
 
 int	handle_special(char *input, int *i, t_token **tokens)
 {
-    t_token_type	type;
-    int				len;
-    char			*value;
-    
-    if (!input || !i || !tokens)
-        return (0);
-    len = 1;
-    if (input[*i] == '<' && input[*i + 1] == '<')
-        type = TOKEN_HEREDOC, len = 2;
-    else if (input[*i] == '>' && input[*i + 1] == '>')
-        type = TOKEN_REDIR_APPEND, len = 2;
-    else if (input[*i] == '<')
-        type = TOKEN_REDIR_IN;
-    else if (input[*i] == '>')
-        type = TOKEN_REDIR_OUT;
-    else
-        type = TOKEN_PIPE;
-    value = ft_substr(input, *i, len);
-    if (!value)
-        return (0);
-    add_token(tokens, create_token(type, value));
-    *i += len;
-    return (1);
+	t_token_type	type;
+	int				len;
+	char			*value;
+
+	if (!input || !i || !tokens)
+		return (0);
+	len = 1;
+	type = get_token_type(input, *i, &len);
+	value = ft_substr(input, *i, len);
+	if (!create_special_token(tokens, value, type))
+		return (0);
+	*i += len;
+	if (type == TOKEN_HEREDOC)
+		return (handle_heredoc_delimiter(input, i, tokens));
+	return (1);
 }
 
 int	handle_word(char *input, int *i, t_token **tokens)
