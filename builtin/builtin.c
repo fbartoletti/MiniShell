@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
+/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:42:25 by barto             #+#    #+#             */
-/*   Updated: 2025/02/05 15:28:13 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/11 14:57:09 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,10 +108,21 @@ int	ft_exit(t_minishell *shell, char **args)
 {
 	int	status;
 
+	ft_putendl_fd("exit", 2);
 	if (args[1])
+	{
+		if (!is_numeric(args[1]))
+		{
+			ft_putstr_fd("exit: ", 2);
+			ft_putstr_fd(args[1], 2);
+			ft_putendl_fd(": numeric argument required", 2);
+			shell->exit_status = 2;
+			exit(2);
+		}
 		status = ft_atoi(args[1]);
+	}
 	else
 		status = shell->exit_status;
-	printf("exit shell ...\n");
-	exit(status);
+	shell->exit_status = status & 0xFF;
+	exit(shell->exit_status);
 }

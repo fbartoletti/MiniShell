@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/11 14:46:03 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/11 15:00:15 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,7 @@ void			cleanup_heredoc(int quote_mode, char *real_delimiter,
 char			*handle_heredoc_loop(char *content, char *real_delimiter,
 	int quote_mode, t_minishell *shell);
 
-/* builtin.c and builtin_utils.c */
+/* builtin.c and builtin_utils.c and exit_utils.c */
 int				ft_echo(t_minishell *shell, char **args);
 int				ft_cd(t_minishell *shell, char **args);
 int				ft_cd_handle_path(t_minishell *shell, char **args, char **path, char **old_pwd);
@@ -215,6 +215,7 @@ int				ft_export_handle_arg(t_minishell *shell, char *arg);
 char			*create_env_string(char *name, char *value);
 int				find_env_index(char **env, char *name);
 void 			add_new_env_var(t_minishell *shell, char *env_string);
+int				is_numeric(char *str);
 
 /* signals.c */
 int				execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec);
@@ -242,6 +243,3 @@ int				handle_no_equal(t_minishell *shell, char *name, char *value);
 
 /* TO DO LIST */
 //sistemare pipe
-
-//exit con lettera mi deve uscire con 2
-//exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
