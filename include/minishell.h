@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/11 14:35:50 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/11 14:46:03 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ int				ft_strncmp(const char *s1, const char *s2, size_t n);
 /* art.c */
 void			art(void);
 
-/* exec.c and exec_utils.c and exe_utils.c and exe.c and executor.c */
+/* exec.c and exec_utils.c and exe_utils.c and exe.c and executor.c and heredoc_utils.c */
 char			*find_command_path(t_minishell *shell, char *cmd);
 int				setup_redirection(t_redir *redir, t_minishell *shell);
 void			handle_redirections(t_command *cmd, t_minishell *shell);
@@ -192,6 +192,13 @@ int				execute_builtin_command(t_minishell *shell, t_command *cmd);
 int				handle_heredoc_token(char *input, int *i, t_token **tokens);
 char			*read_heredoc_input(char *delimiter, t_minishell *shell);
 int				handle_heredoc(t_redir *redir, t_minishell *shell);
+char			*init_heredoc(char *delimiter, t_minishell *shell,
+	char **real_delimiter, int *quote_mode);
+char			*process_heredoc_line(char *line, t_minishell *shell, int quote_mode);
+void			cleanup_heredoc(int quote_mode, char *real_delimiter,
+	t_minishell *shell);
+char			*handle_heredoc_loop(char *content, char *real_delimiter,
+	int quote_mode, t_minishell *shell);
 
 /* builtin.c and builtin_utils.c */
 int				ft_echo(t_minishell *shell, char **args);
@@ -238,4 +245,3 @@ int				handle_no_equal(t_minishell *shell, char *name, char *value);
 
 //exit con lettera mi deve uscire con 2
 //exit con piu di 2 arg mi deve dare too many arg e rimanere sulla shell con codice uscita 2
-//accorcia read_heredoc_input
