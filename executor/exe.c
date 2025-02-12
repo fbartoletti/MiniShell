@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:22:32 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 15:36:35 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/12 09:35:21 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,23 +86,4 @@ void	restore_redirections(int saved_stdin, int saved_stdout)
 		dup2(saved_stdout, STDOUT_FILENO);
 		close(saved_stdout);
 	}
-}
-
-int	execute_builtin_command(t_minishell *shell, t_command *cmd)
-{
-	if (!ft_strcmp(cmd->args[0], "echo"))
-		return (ft_echo(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "cd"))
-		return (ft_cd(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "pwd"))
-		return (ft_pwd(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "export"))
-		return (ft_export(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "unset"))
-		return (ft_unset(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "env"))
-		return (ft_env(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "exit"))
-		return (ft_exit(shell, cmd->args));
-	return (1);
 }

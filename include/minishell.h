@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/11 15:00:15 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/12 09:38:33 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,3 +243,6 @@ int				handle_no_equal(t_minishell *shell, char *name, char *value);
 
 /* TO DO LIST */
 //sistemare pipe
+// << << airdoc sensa arg deve dare errore 
+// << EOF << airdoc concatenati ctr d chiude uno alla volta 
+// << EOF | << EOF airdoc con pipe concatenate 
