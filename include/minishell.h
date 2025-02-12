@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/12 09:38:33 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/12 18:29:07 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_token
 	t_token_type	type;
 	char			*value;
 	struct s_token	*next;
+	struct s_token	*prev;
 }   t_token;
 
 typedef struct s_redir

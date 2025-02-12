@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:48:19 by barto             #+#    #+#             */
-/*   Updated: 2025/01/02 13:43:55 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/12 18:29:47 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,15 @@ t_token	*create_token(t_token_type type, char *value)
 void	add_token(t_token **tokens, t_token *new)
 {
 	t_token	*tmp;
-	
+
 	if (!*tokens)
-	{
 		*tokens = new;
-		return;
+	else
+	{
+		tmp = *tokens;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+		new->prev = tmp;
 	}
-	tmp = *tokens;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = new;
 }

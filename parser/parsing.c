@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:08:10 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 10:16:06 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/12 18:28:49 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,11 @@ int	parse_token(t_minishell *shell, t_token *token, t_command *cmd)
 		handle_redirection(cmd, token);
 		return (2);
 	}
-	else if (token->type == TOKEN_WORD)
+	else if (token->type == TOKEN_WORD && 
+             (!token->prev || token->prev->type != TOKEN_HEREDOC))
+	{
 		handle_word_token(cmd, token->value);
+	}
 	return (1);
 }
 
@@ -92,7 +95,8 @@ int	parse_command(t_minishell *shell)
 			return (0);
 		if (ret == 2)
 			current = current->next;
-		current = current->next;
+		else
+			current = current->next;
 	}
 	add_command_to_shell(shell, cmd);
 	return (1);
