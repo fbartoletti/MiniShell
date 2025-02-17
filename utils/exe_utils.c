@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exe_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:13:44 by barto             #+#    #+#             */
-/*   Updated: 2025/02/11 14:42:27 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/17 09:23:39 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,43 @@
 char	*read_heredoc_input(char *delimiter, t_minishell *shell)
 {
 	char	*content;
-	char	*real_delimiter;
+	char	*line;
 	int		quote_mode;
+	char	*real_delimiter;
 
-	content = init_heredoc(delimiter, shell, &real_delimiter, &quote_mode);
+	content = ft_strdup("");
 	if (!content)
-		return (NULL);
-	content = handle_heredoc_loop(content, real_delimiter, quote_mode, shell);
-	cleanup_heredoc(quote_mode, real_delimiter, shell);
-	return (content);
+		return NULL;
+	quote_mode = (delimiter[0] == '\'' && 
+				 delimiter[ft_strlen(delimiter) - 1] == '\'');
+	if (quote_mode)
+		real_delimiter = ft_strtrim(delimiter, "'");
+	else
+		real_delimiter = ft_strdup(delimiter);
+	while (1)
+	{
+		line = readline("> ");
+		if (!line || ft_strcmp(line, real_delimiter) == 0)
+		{
+			free(line);
+			break;
+		}
+		if (!quote_mode && ft_strchr(line, '$'))
+		{
+			char *expanded = expand_variables(shell, line);
+			free(line);
+			line = expanded;
+		}
+		content = append_line_to_content(content, line);
+		free(line);
+		if (!content)
+		{
+			free(real_delimiter);
+			return NULL;
+		}
+	}
+	free(real_delimiter);
+	return content;
 }
 
 int	handle_heredoc_token(char *input, int *i, t_token **tokens)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/14 10:23:32 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/17 09:24:15 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,49 +51,62 @@ typedef enum e_token_type
 	TOKEN_EOF
 }   t_token_type;
 
+typedef struct s_hdoc
+{
+	char					*delimiter;
+	struct s_hdoc			*next;
+}	t_hdoc;
+
+typedef struct s_heredoc_queue
+{
+    char 					*delimiter;
+    char 					*content;
+    struct s_heredoc_queue	*next;
+} t_heredoc_queue;
+
 typedef struct s_token
 {
-	t_token_type	type;
-	char			*value;
-	struct s_token	*next;
-	struct s_token	*prev;
+	t_token_type			type;
+	char					*value;
+	struct s_token			*next;
+	struct s_token			*prev;
 }   t_token;
 
 typedef struct s_redir
 {
-	t_token_type	type;
-	char			*file;
-	struct s_redir	*next;
+	t_token_type			type;
+	char					*file;
+	struct s_redir			*next;
 }   t_redir;
 
 typedef struct s_command
 {
-	char				**args;
-	t_redir				*redirs;
-	struct s_command	*next;
+	char					**args;
+	t_redir					*redirs;
+	struct s_command		*next;
 }   t_command;
 
 typedef struct s_minishell
 {
-	char		**env;
-	t_token		*tokens;
-	t_command	*commands;
-	int			exit_status;
-	int			in_heredoc;
+	char					**env;
+	t_token					*tokens;
+	t_command				*commands;
+	int						exit_status;
+	int						in_heredoc;
 }   t_minishell;
 
 typedef struct s_executor
 {
-	int		pipe_fd[2];
-	int		prev_pipe;
-	pid_t	pid;
-	int		status;
+	int						pipe_fd[2];
+	int						prev_pipe;
+	pid_t					pid;
+	int						status;
 } t_executor;
 
 typedef struct s_builtin
 {
-    char	*name;
-    int		(*func)(t_minishell *shell, char **args);
+	char					*name;
+	int						(*func)(t_minishell *shell, char **args);
 } t_builtin;
 
 /* main.c and main_utils.c */
@@ -140,7 +153,7 @@ char			*handle_expansion(t_minishell *shell, char *str, int *i);
 char			*expand_env_var(t_minishell *shell, char *str, int *i);
 int				expand_command_args(t_minishell *shell, t_command *cmd);
 void			execute_child_process(t_minishell *shell, t_command *cmd,
-	t_executor *exec);
+				t_executor *exec);
 char			*create_quoted_value(char *value, char quote);
 
 /* quote_handler.c and quote_handler_utils.c */
@@ -187,19 +200,19 @@ void 			check_command_path(char *cmd_path, char *cmd);
 void			handle_command_error(char *cmd);
 void			restore_redirections(int saved_stdin, int saved_stdout);
 int				setup_builtin_redirections(t_command *cmd, int *saved_stdin, int *saved_stdout,
-	t_minishell *shell);
+				t_minishell *shell);
 char			*append_line_to_content(char *content, char *line);
 int				execute_builtin_command(t_minishell *shell, t_command *cmd);
 int				handle_heredoc_token(char *input, int *i, t_token **tokens);
 char			*read_heredoc_input(char *delimiter, t_minishell *shell);
 int				handle_heredoc(t_redir *redir, t_minishell *shell);
 char			*init_heredoc(char *delimiter, t_minishell *shell,
-	char **real_delimiter, int *quote_mode);
+				char **real_delimiter, int *quote_mode);
 char			*process_heredoc_line(char *line, t_minishell *shell, int quote_mode);
 void			cleanup_heredoc(int quote_mode, char *real_delimiter,
-	t_minishell *shell);
+				t_minishell *shell);
 char			*handle_heredoc_loop(char *content, char *real_delimiter,
-	int quote_mode, t_minishell *shell);
+				int quote_mode, t_minishell *shell);
 
 /* builtin.c and builtin_utils.c and exit_utils.c */
 int				ft_echo(t_minishell *shell, char **args);
@@ -240,10 +253,21 @@ int				is_valid_identifier(const char *name);
 int				handle_error(char *name, char *value);
 int				handle_no_equal(t_minishell *shell, char *name, char *value);
 
+//test funzioni da inserire 
+t_heredoc_queue	*create_heredoc_queue(void);
+void			add_to_heredoc_queue(t_heredoc_queue **queue, char *delimiter);
+char			*process_heredoc_queue(t_minishell *shell, t_heredoc_queue *queue);
+void			free_hdoc_list(t_hdoc *list);
+char			*process_hdoc_content(t_minishell *shell, t_hdoc *hdocs);
+void			add_hdoc(t_hdoc **list, t_hdoc *new);
+t_hdoc			*create_hdoc_node(char *delimiter);
+
 #endif
 
 /* TO DO LIST */
-//sistemare pipe
+// sistemare pipe
+// correggere > output heredoc
 // << << airdoc sensa arg deve dare errore 
 // << EOF << airdoc concatenati ctr d chiude uno alla volta da sinistra a destra 
 // << EOF | << EOF airdoc con pipe concatenate
+// rivisita read_heredoc_input e handle_heredoc e process_hdoc_content

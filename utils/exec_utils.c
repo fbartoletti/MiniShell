@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:38:15 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 16:12:19 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/17 09:22:45 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,20 +100,44 @@ void	free_array(char **array)
 
 int	handle_heredoc(t_redir *redir, t_minishell *shell)
 {
+	t_hdoc	*hdocs;
 	char	*content;
 	int		pipe_fd[2];
+	t_token	*curr;
+	t_hdoc 	*last_hdoc;
 
-	if (pipe(pipe_fd) < 0)
-		return (-1);
-	content = read_heredoc_input(redir->file, shell);
-	if (!content)
+	hdocs = NULL;
+	last_hdoc = NULL;
+	curr = shell->tokens;
+	while (curr)
 	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
+		if (curr->type == TOKEN_HEREDOC && curr->next)
+		{
+			t_hdoc *new_hdoc = create_hdoc_node(curr->next->value);
+			if (!hdocs)
+				hdocs = new_hdoc;
+			else
+				last_hdoc->next = new_hdoc;
+			last_hdoc = new_hdoc;
+		}
+		curr = curr->next;
+	}
+	if (!hdocs)
+		hdocs = create_hdoc_node(redir->file);
+	if (pipe(pipe_fd) < 0)
+	{
+		free_hdoc_list(hdocs);
 		return (-1);
 	}
-	write(pipe_fd[1], content, ft_strlen(content));
-	free(content);
+	shell->in_heredoc = 1;
+	content = process_hdoc_content(shell, hdocs);
+	shell->in_heredoc = 0;
+	if (content)
+	{
+		write(pipe_fd[1], content, ft_strlen(content));
+		free(content);
+	}
 	close(pipe_fd[1]);
+	free_hdoc_list(hdocs);
 	return (pipe_fd[0]);
 }
