@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:36:43 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 15:43:34 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/25 15:00:28 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec)
 	if (!cmd->args || !cmd->args[0])
 		return (0);
 	expand_command_args(shell, cmd);
-	if (is_builtin(cmd->args[0]) && !cmd->next)
+	if (is_builtin(cmd->args[0]) && !cmd->next && !exec->prev_pipe && !exec->pipe_fd[1])
 		return (execute_builtin(shell, cmd));
 	handle_parent_signals();
 	exec->pid = fork();

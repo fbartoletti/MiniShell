@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 11:49:38 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 15:30:28 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/25 14:58:49 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,15 @@ void	execute_child_process(t_minishell *shell, t_command *cmd, t_executor *exec)
 {
 	handle_child_signals();
 	setup_pipes(exec);
+	if (exec->pipe_fd[0] != -1)
+		close(exec->pipe_fd[0]);
 	handle_redirections(cmd, shell);
+	if (!cmd->args || !cmd->args[0])
+		exit(0);
 	if (is_builtin(cmd->args[0]))
 		exit(execute_builtin(shell, cmd));
 	execute_external(shell, cmd);
+	exit(127);
 }
 
 char	*create_quoted_value(char *value, char quote)

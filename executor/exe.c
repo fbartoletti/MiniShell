@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:22:32 by barto             #+#    #+#             */
-/*   Updated: 2025/02/12 09:35:21 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/25 14:59:45 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,20 @@
 void	close_pipes(t_executor *exec)
 {
 	if (exec->prev_pipe != -1)
+	{
 		close(exec->prev_pipe);
+		exec->prev_pipe = -1;
+	}
 	if (exec->pipe_fd[0] != -1)
+	{
 		close(exec->pipe_fd[0]);
+		exec->pipe_fd[0] = -1;
+	}
 	if (exec->pipe_fd[1] != -1)
+	{
 		close(exec->pipe_fd[1]);
+		exec->pipe_fd[1] = -1;
+	}
 }
 
 void	init_executor(t_executor *exec)
@@ -33,22 +42,27 @@ void	init_executor(t_executor *exec)
 
 void	wait_all_processes(t_minishell *shell, t_command *cmd)
 {
-	int	status;
-	int	last_pid;
+	int		status;
+	pid_t	pid;
+	int		cmd_count;
 
-	last_pid = -1;
+	cmd_count = 0;
 	while (cmd)
 	{
 		if (cmd->args && cmd->args[0])
-			last_pid = wait(&status);
+			cmd_count++;
 		cmd = cmd->next;
 	}
-	if (last_pid != -1)
+	while (cmd_count > 0)
 	{
+		pid = waitpid(-1, &status, 0);
+		if (pid == -1)
+			break;
 		if (WIFEXITED(status))
 			shell->exit_status = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
 			shell->exit_status = 128 + WTERMSIG(status);
+		cmd_count--;
 	}
 }
 

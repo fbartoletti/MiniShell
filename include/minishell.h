@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
+/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/17 09:24:15 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/02/25 15:57:28 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,8 @@ typedef struct s_minishell
 	t_command				*commands;
 	int						exit_status;
 	int						in_heredoc;
+	int						stdin_copy;
+	int						stdout_copy;
 }   t_minishell;
 
 typedef struct s_executor
@@ -190,10 +192,7 @@ void			setup_pipes(t_executor *exec);
 int				is_builtin(char *cmd);
 int				execute_builtin(t_minishell *shell, t_command *cmd);
 void			free_array(char **array);
-int				execute_commands(t_minishell *shell);
 void			execute_external(t_minishell *shell, t_command *cmd);
-int				execute_commands(t_minishell *shell);
-void			init_executor(t_executor *exec);
 void			close_pipes(t_executor *exec);
 void			wait_all_processes(t_minishell *shell, t_command *cmd);
 void 			check_command_path(char *cmd_path, char *cmd);
@@ -213,7 +212,8 @@ void			cleanup_heredoc(int quote_mode, char *real_delimiter,
 				t_minishell *shell);
 char			*handle_heredoc_loop(char *content, char *real_delimiter,
 				int quote_mode, t_minishell *shell);
-
+void			executor(t_minishell *shell);
+void			handle_pipeline(t_minishell *shell);
 /* builtin.c and builtin_utils.c and exit_utils.c */
 int				ft_echo(t_minishell *shell, char **args);
 int				ft_cd(t_minishell *shell, char **args);
@@ -261,6 +261,8 @@ void			free_hdoc_list(t_hdoc *list);
 char			*process_hdoc_content(t_minishell *shell, t_hdoc *hdocs);
 void			add_hdoc(t_hdoc **list, t_hdoc *new);
 t_hdoc			*create_hdoc_node(char *delimiter);
+void			cleanup_child_process(t_minishell *shell);
+int				handle_exit_status(int status);
 
 #endif
 

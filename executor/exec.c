@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:21 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 15:36:13 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/25 15:56:16 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,17 @@
 int	is_builtin(char *cmd)
 {
 	const char *builtins[8];
-    int i;
+	int i;
 
 	i = 0;
-    builtins[0] = "echo";
-    builtins[1] = "cd";
-    builtins[2] = "pwd";
-    builtins[3] = "export";
-    builtins[4] = "unset";
-    builtins[5] = "env";
-    builtins[6] = "exit";
-    builtins[7] = NULL;
+	builtins[0] = "echo";
+	builtins[1] = "cd";
+	builtins[2] = "pwd";
+	builtins[3] = "export";
+	builtins[4] = "unset";
+	builtins[5] = "env";
+	builtins[6] = "exit";
+	builtins[7] = NULL;
 	while (builtins[i])
 	{
 		if (!ft_strcmp(cmd, builtins[i]))
@@ -41,14 +41,14 @@ void	setup_pipes(t_executor *exec)
 	{
 		dup2(exec->prev_pipe, STDIN_FILENO);
 		close(exec->prev_pipe);
+		exec->prev_pipe = -1;
 	}
 	if (exec->pipe_fd[1] != -1)
 	{
 		dup2(exec->pipe_fd[1], STDOUT_FILENO);
 		close(exec->pipe_fd[1]);
+		exec->pipe_fd[1] = -1;
 	}
-	if (exec->pipe_fd[0] != -1)
-		close(exec->pipe_fd[0]);
 }
 
 void	execute_external(t_minishell *shell, t_command *cmd)
@@ -56,14 +56,29 @@ void	execute_external(t_minishell *shell, t_command *cmd)
 	char	*cmd_path;
 
 	if (!cmd->args[0])
+	{
+		cleanup_child_process(shell);
 		exit(0);
+	} 
 	cmd_path = find_command_path(shell, cmd->args[0]);
-	check_command_path(cmd_path, cmd->args[0]);
+	if (!cmd_path)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd->args[0], 2);
+		ft_putendl_fd(": command not found", 2);
+		cleanup_child_process(shell);
+		exit(127);
+	}
 	if (execve(cmd_path, cmd->args, shell->env) == -1)
 	{
 		handle_command_error(cmd->args[0]);
+		free(cmd_path);
+		cleanup_child_process(shell);
 		exit(126);
 	}
+	free(cmd_path);
+	cleanup_child_process(shell);
+	exit(1);
 }
 
 int	execute_builtin(t_minishell *shell, t_command *cmd)

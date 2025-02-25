@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 16:40:20 by barto             #+#    #+#             */
-/*   Updated: 2025/01/08 11:52:08 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/25 15:55:36 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,24 @@ int	validate_and_tokenize(t_minishell *shell, char *line)
 
 void	cleanup_process(t_minishell *shell)
 {
-	free_tokens(shell->tokens);
-	free_commands(shell->commands);
+	if (shell->tokens)
+	{
+		free_tokens(shell->tokens);
+		shell->tokens = NULL;
+	}
+	if (shell->commands)
+	{
+		free_commands(shell->commands);
+		shell->commands = NULL;
+	}
+}
+
+void	cleanup_child_process(t_minishell *shell)
+{
 	shell->tokens = NULL;
 	shell->commands = NULL;
+	if (shell->stdin_copy != -1)
+		close(shell->stdin_copy);
+	if (shell->stdout_copy != -1)
+		close(shell->stdout_copy);
 }

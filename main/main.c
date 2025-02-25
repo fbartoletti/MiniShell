@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:22:30 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 15:41:11 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/25 15:56:49 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static void	process_line(t_minishell *shell, char *line)
 		cleanup_process(shell);
 		return;
 	}
-	execute_commands(shell);
+	executor(shell);
 	cleanup_process(shell);
 }
 
