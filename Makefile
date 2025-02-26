@@ -31,10 +31,12 @@ SRCS = main/main.c \
        utils/heredoc_utils.c \
        utils/heredoc_util.c \
        utils/exit_utils.c \
+       utils/executor_redir_utils.c \
        executor/exec.c \
        executor/exe.c \
        executor/executor.c \
        executor/signals.c \
+       executor/executor_redir.c \
        builtin/builtin.c \
 
 OBJS = $(SRCS:.c=.o)

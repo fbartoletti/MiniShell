@@ -35,15 +35,20 @@ void	free_command_content(t_command *cmd)
 	}
 }
 
-t_command	*create_command(void)
+t_command *create_command(void)
 {
-	t_command	*cmd;
-	
-	cmd = safe_malloc(sizeof(t_command));
-	cmd->args = NULL;
-	cmd->redirs = NULL;
-	cmd->next = NULL;
-	return (cmd);
+    t_command *cmd;
+    
+    cmd = safe_malloc(sizeof(t_command));
+    if (!cmd)
+        return (NULL);
+    
+    cmd->args = NULL;
+    cmd->redirs = NULL;
+    cmd->next = NULL;
+    // Se ci sono altri campi nella struttura, inizializzali qui
+    
+    return (cmd);
 }
 
 void	add_command(t_command **commands, t_command *new)

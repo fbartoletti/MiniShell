@@ -56,29 +56,33 @@ static void	handle_word_token(t_command *cmd, char *word)
 	cmd->args = new_args;
 }
 
-int	parse_token(t_minishell *shell, t_token *token, t_command *cmd)
+int parse_token(t_minishell *shell, t_token *token, t_command *cmd)
 {
-	if (token->type == TOKEN_PIPE)
-	{
-		if (!cmd->args && !cmd->redirs)
-			return (print_error(ERR_PIPE), 0);
-			
-		add_command_to_shell(shell, cmd);
-		return (1);
-	}
-	else if (is_redir_token(token->type))
-	{
-		if (!validate_redirections(token))
-			return (0);
-		handle_redirection(cmd, token);
-		return (2);
-	}
-	else if (token->type == TOKEN_WORD && 
-			 (!token->prev || token->prev->type != TOKEN_HEREDOC))
-	{
-		handle_word_token(cmd, token->value);
-	}
-	return (1);
+    // Controllo di sicurezza all'inizio della funzione
+    if (!token || !cmd)
+        return (0);
+
+    if (token->type == TOKEN_PIPE)
+    {
+        if (!cmd->args && !cmd->redirs)
+            return (print_error(ERR_PIPE), 0);
+        add_command_to_shell(shell, cmd);
+        return (1);
+    }
+    else if (is_redir_token(token->type))
+    {
+        if (!validate_redirections(token))
+            return (0);
+        handle_redirection(cmd, token);
+        return (2);
+    }
+    else if (token->type == TOKEN_WORD)
+    {
+        // Controllo più sicuro per evitare accessi non validi
+        if (!token->prev || (token->prev && token->prev->type != TOKEN_HEREDOC))
+            handle_word_token(cmd, token->value);
+    }
+    return (1);
 }
 
 int	parse_command(t_minishell *shell)

@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:31:12 by barto             #+#    #+#             */
 /*   Updated: 2025/02/25 15:54:28 by barto            ###   ########.fr       */
@@ -12,152 +12,144 @@
 
 #include "../include/minishell.h"
 
-void	executor(t_minishell *shell)
+static void handle_single_builtin(t_terminal *term);
+
+void run_commands(t_terminal *term)
 {
-	    pid_t pid;
+    pid_t pid;
     int status;
 
-    // Salva i file descriptor originali
-    shell->stdin_copy = dup(STDIN_FILENO);
-    shell->stdout_copy = dup(STDOUT_FILENO);
-    if (shell->stdin_copy == -1 || shell->stdout_copy == -1)
+    term->stdin_copy = dup(STDIN_FILENO);
+    term->stdout_copy = dup(STDOUT_FILENO);
+    if (term->stdin_copy == -1 || term->stdout_copy == -1)
     {
-        print_error("dup error");
+        ft_putstr_fd("dup error\n", 2);
         return;
     }
 
     // Esegui builtin direttamente se è l'unico comando
-    if (shell->commands && !shell->commands->next && 
-        shell->commands->args && shell->commands->args[0] && 
-        is_builtin(shell->commands->args[0]))
-    {
-        t_command *cmd = shell->commands;
-        
-        // Applica redirezioni
-        handle_redirections(cmd, shell);
-        shell->exit_status = execute_builtin(shell, cmd);
-    }
+    if (term->pipe_count == 0 && term->commands->builtin.is_builtin)
+        handle_single_builtin(term);
     else
     {
         // Gestisci i segnali per l'esecuzione
-        signal(SIGINT, SIG_IGN);
-        signal(SIGQUIT, SIG_IGN);
+        ignore_signals();
         
         // Crea un solo processo per tutta la pipeline
         pid = fork();
         if (pid == -1)
         {
-            print_error("Fork failed");
-            close(shell->stdin_copy);
-            close(shell->stdout_copy);
+            ft_putstr_fd("Fork failed\n", 2);
+            close(term->stdin_copy);
+            close(term->stdout_copy);
             return;
         }
         
         if (pid == 0)
         {
             // Processo figlio gestisce tutte le pipe
-            handle_pipeline(shell);
+            execute_pipeline(term);
             // Non torna mai qui
         }
         
         // Aspetta che il processo pipeline termini
         waitpid(pid, &status, 0);
         
-        // Ripristina i gestori di segnali interattivi
-        signal(SIGINT, handle_signal);
-        signal(SIGQUIT, SIG_IGN);
+        // Ripristina i gestori di segnali
+        setup_interactive_signals();
         
-        shell->exit_status = handle_exit_status(status);
+        g_last_status = get_exit_code(status);
     }
     
     // Ripristina i file descriptor originali
-    dup2(shell->stdin_copy, STDIN_FILENO);
-    dup2(shell->stdout_copy, STDOUT_FILENO);
-    close(shell->stdin_copy);
-    close(shell->stdout_copy);
+    restore_io(term);
 }
 
-void	handle_pipeline(t_minishell *shell)
+static void handle_single_builtin(t_terminal *term)
 {
-    t_command *current;
+    t_command_info *cmd;
+
+    cmd = term->commands;
+    setup_input_redirects(cmd->redirects);
+    setup_output_redirects(cmd->redirects);
+    execute_builtin_command(term, cmd);
+}
+
+void execute_pipeline(t_terminal *term)
+{
     int fd[2];
+    t_command_info *cmd;
     pid_t pid;
-    
-    current = shell->commands;
+
+    cmd = term->commands;
     
     // Per gestire il caso in cui non ci sono comandi
-    if (!current)
+    if (!cmd)
         exit(0);
         
-    while (current)
+    while (cmd)
     {
         if (pipe(fd) == -1)
         {
-            print_error("Pipe error");
+            ft_putstr_fd("Pipe error\n", 2);
             exit(1);
         }
             
         pid = fork();
         if (pid == -1)
         {
-            print_error("Fork error in pipeline");
+            ft_putstr_fd("Fork error in pipeline\n", 2);
             exit(1);
         }
             
         if (pid == 0)
         {
-            // Processo figlio del figlio esegue il comando
-            if (current->next)
+            // Processo figlio esegue il comando
+            if (cmd->next)
                 dup2(fd[1], STDOUT_FILENO);
                 
             close(fd[0]);
             close(fd[1]);
             
             // Applica redirezioni
-            handle_redirections(current, shell);
+            setup_input_redirects(cmd->redirects);
+            setup_output_redirects(cmd->redirects);
             
             // Esegui builtin o comando esterno
-            if (current->args && current->args[0])
+            if (cmd->matrix && cmd->matrix[0])
             {
-                if (is_builtin(current->args[0]))
+                if (cmd->builtin.is_builtin)
                 {
-                    int ret = execute_builtin(shell, current);
-                    cleanup_child_process(shell);
-                    exit(ret);
+                    execute_builtin_command(term, cmd);
+                    exit(g_last_status);
                 }
                 else
-                {
-                    execute_external(shell, current);
-                    // execute_external già termina con exit
-                }
+                    run_external_command(term, cmd);
             }
             
-            cleanup_child_process(shell);
             exit(0);
         }
         else
         {
-            // Processo figlio principale gestisce la pipeline
+            // Processo padre gestisce la pipeline
             close(fd[1]);
             
-            if (current->next)
+            if (cmd->next)
                 dup2(fd[0], STDIN_FILENO);
                 
             close(fd[0]);
-            current = current->next;
+            cmd = cmd->next;
         }
     }
     
-    // Attendi tutti i processi figli
+    // Aspetta tutti i processi figli
     while (wait(NULL) > 0)
         ;
         
-    // Il processo pipeline termina qui
-    cleanup_child_process(shell);
-    exit(shell->exit_status);
+    exit(g_last_status);
 }
 
-int handle_exit_status(int status)
+int get_exit_code(int status)
 {
     if (WIFEXITED(status))
         return WEXITSTATUS(status);

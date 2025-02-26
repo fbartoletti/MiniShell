@@ -39,12 +39,14 @@ static void	init_signals(void)
 
 void init_minishell(t_minishell *shell, char **env)
 {
-	shell->env = env;
-	shell->tokens = NULL;
-	shell->commands = NULL;
-	shell->exit_status = 0;
-	shell->in_heredoc = 0;
-	init_signals();
+    shell->env = env;
+    shell->tokens = NULL;
+    shell->commands = NULL;
+    shell->exit_status = 0;
+    shell->in_heredoc = 0;
+    shell->stdin_copy = -1;
+    shell->stdout_copy = -1;
+    init_signals();
 }
 
 static void	process_line(t_minishell *shell, char *line)

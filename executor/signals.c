@@ -1,9 +1,9 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
+/*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42roma.it>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:36:43 by barto             #+#    #+#             */
 /*   Updated: 2025/02/25 15:00:28 by barto            ###   ########.fr       */
@@ -12,41 +12,46 @@
 
 #include "../include/minishell.h"
 
-int	execute_single_command(t_minishell *shell, t_command *cmd, t_executor *exec)
+static void signal_handler(int signum);
+static void signal_ignore_handler(int signum);
+
+void setup_interactive_signals(void)
 {
-	if (!cmd->args || !cmd->args[0])
-		return (0);
-	expand_command_args(shell, cmd);
-	if (is_builtin(cmd->args[0]) && !cmd->next && !exec->prev_pipe && !exec->pipe_fd[1])
-		return (execute_builtin(shell, cmd));
-	handle_parent_signals();
-	exec->pid = fork();
-	if (exec->pid < 0)
-	{
-		restore_signals();
-		return (-1);
-	}
-	if (exec->pid == 0)
-		execute_child_process(shell, cmd, exec);
-	restore_signals();
-	return (0);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
 }
 
-void	handle_child_signals(void)
+static void signal_handler(int signum)
 {
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
-	g_signal_received = 0;
+    if (signum == SIGINT)
+    {
+        g_last_status = 1;
+        printf("\n");
+        rl_replace_line("", 0);
+        rl_on_new_line();
+        rl_redisplay();
+    }
+    else if (signum == SIGTERM)
+        exit(0);
 }
 
-void	handle_parent_signals(void)
+void ignore_signals(void)
 {
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
+    signal(SIGINT, signal_ignore_handler);
+    signal(SIGTERM, signal_ignore_handler);
 }
 
-void	restore_signals(void)
+static void signal_ignore_handler(int signum)
 {
-	signal(SIGINT, handle_signal);
-	signal(SIGQUIT, SIG_IGN);
+    (void)signum;
+    return;
+}
+
+void handle_exec_signals(int signum)
+{
+    if (signum == SIGINT)
+        g_last_status = 130;
+    if (signum == SIGQUIT)
+        g_last_status = 131;
 }

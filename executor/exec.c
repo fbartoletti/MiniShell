@@ -55,29 +55,27 @@ void	execute_external(t_minishell *shell, t_command *cmd)
 {
 	char	*cmd_path;
 
-	if (!cmd->args[0])
+	if (!cmd->args || !cmd->args[0])
 	{
-		cleanup_child_process(shell);
 		exit(0);
-	} 
+	}
 	cmd_path = find_command_path(shell, cmd->args[0]);
 	if (!cmd_path)
 	{
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(cmd->args[0], 2);
 		ft_putendl_fd(": command not found", 2);
-		cleanup_child_process(shell);
 		exit(127);
 	}
 	if (execve(cmd_path, cmd->args, shell->env) == -1)
 	{
-		handle_command_error(cmd->args[0]);
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(strerror(errno), 2);
+		ft_putendl_fd("", 2);
 		free(cmd_path);
-		cleanup_child_process(shell);
 		exit(126);
 	}
 	free(cmd_path);
-	cleanup_child_process(shell);
 	exit(1);
 }
 

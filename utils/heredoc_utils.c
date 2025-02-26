@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-char	*init_heredoc(char *delimiter, t_minishell *shell,
+char	*init_heredoc(char *delimiter, t_minishell *shell, 
 	char **real_delimiter, int *quote_mode)
 {
 	char	*content;
@@ -65,14 +65,16 @@ char	*handle_heredoc_loop(char *content, char *real_delimiter,
 			free(line);
 			break;
 		}
-		line = process_heredoc_line(line, shell, quote_mode);
+		if (!quote_mode && ft_strchr(line, '$'))
+		{
+			char *expanded = expand_variables(shell, line);
+			free(line);
+			line = expanded;
+		}
 		content = append_line_to_content(content, line);
 		free(line);
 		if (!content)
-		{
-			cleanup_heredoc(quote_mode, real_delimiter, shell);
 			return (NULL);
-		}
 	}
 	return (content);
 }

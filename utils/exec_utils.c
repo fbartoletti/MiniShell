@@ -12,44 +12,45 @@
 
 #include "../include/minishell.h"
 
-static char	*join_path(char *path, char *cmd)
-{
-	char	*tmp;
-	char	*full_path;
-
-	tmp = ft_strjoin(path, "/");
-	if (!tmp)
-		return (NULL);
-	full_path = ft_strjoin(tmp, cmd);
-	free(tmp);
-	return (full_path);
-}
-
 char	*find_command_path(t_minishell *shell, char *cmd)
 {
 	char	**paths;
 	char	*path_env;
 	char	*full_path;
 	int		i;
-
+	
+	if (!cmd || !*cmd)
+		return (NULL);
 	if (ft_strchr(cmd, '/'))
 		return (ft_strdup(cmd));
 	path_env = get_env_value(shell->env, "PATH");
+	if (!path_env)
+		return (NULL);
 	paths = ft_split(path_env, ':');
 	free(path_env);
+	if (!paths)
+		return (NULL);
 	i = 0;
 	while (paths[i])
 	{
-		full_path = join_path(paths[i], cmd);
+		char *temp = ft_strjoin(paths[i], "/");
+		full_path = ft_strjoin(temp, cmd);
+		free(temp);
 		if (access(full_path, X_OK) == 0)
 		{
-			free_array(paths);
+			int j = 0;
+			while (paths[j])
+				free(paths[j++]);
+			free(paths);
 			return (full_path);
 		}
 		free(full_path);
 		i++;
 	}
-	free_array(paths);
+	i = 0;
+	while (paths[i])
+		free(paths[i++]);
+	free(paths);
 	return (NULL);
 }
 
@@ -62,6 +63,7 @@ int	setup_redirection(t_redir *redir, t_minishell *shell)
 		fd = open(redir->file, O_RDONLY);
 		if (fd < 0)
 			return (print_error("No such file or directory"), -1);
+		dup2(fd, STDIN_FILENO);
 	}
 	else if (redir->type == TOKEN_HEREDOC)
 	{
@@ -71,13 +73,19 @@ int	setup_redirection(t_redir *redir, t_minishell *shell)
 		dup2(fd, STDIN_FILENO);
 	}
 	else if (redir->type == TOKEN_REDIR_OUT)
+	{
 		fd = open(redir->file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	else
-		fd = open(redir->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (fd < 0)
-		return (print_error("No such file or directory"), -1);
-	if (redir->type != TOKEN_REDIR_IN && redir->type != TOKEN_HEREDOC)
+		if (fd < 0)
+			return (print_error("Error opening output file"), -1);
 		dup2(fd, STDOUT_FILENO);
+	}
+	else
+	{
+		fd = open(redir->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd < 0)
+			return (print_error("Error opening output file"), -1);
+		dup2(fd, STDOUT_FILENO);
+	}
 	close(fd);
 	return (0);
 }
@@ -100,44 +108,28 @@ void	free_array(char **array)
 
 int	handle_heredoc(t_redir *redir, t_minishell *shell)
 {
-	t_hdoc	*hdocs;
 	char	*content;
 	int		pipe_fd[2];
-	t_token	*curr;
-	t_hdoc 	*last_hdoc;
+	char	*real_delimiter;
+	int		quote_mode;
 
-	hdocs = NULL;
-	last_hdoc = NULL;
-	curr = shell->tokens;
-	while (curr)
-	{
-		if (curr->type == TOKEN_HEREDOC && curr->next)
-		{
-			t_hdoc *new_hdoc = create_hdoc_node(curr->next->value);
-			if (!hdocs)
-				hdocs = new_hdoc;
-			else
-				last_hdoc->next = new_hdoc;
-			last_hdoc = new_hdoc;
-		}
-		curr = curr->next;
-	}
-	if (!hdocs)
-		hdocs = create_hdoc_node(redir->file);
 	if (pipe(pipe_fd) < 0)
-	{
-		free_hdoc_list(hdocs);
 		return (-1);
-	}
-	shell->in_heredoc = 1;
-	content = process_hdoc_content(shell, hdocs);
-	shell->in_heredoc = 0;
+		
+	content = init_heredoc(redir->file, shell, &real_delimiter, &quote_mode);
+	if (!content)
+		return (-1);
+		
+	content = handle_heredoc_loop(content, real_delimiter, quote_mode, shell);
+	
 	if (content)
 	{
 		write(pipe_fd[1], content, ft_strlen(content));
 		free(content);
 	}
+	
 	close(pipe_fd[1]);
-	free_hdoc_list(hdocs);
+	cleanup_heredoc(quote_mode, real_delimiter, shell);
+	
 	return (pipe_fd[0]);
 }

@@ -39,29 +39,37 @@ t_token	*tokenize(char *input)
 	return (tokens);
 }
 
-t_token	*create_token(t_token_type type, char *value)
+t_token *create_token(t_token_type type, char *value)
 {
-	t_token	*token;
-	
-	token = safe_malloc(sizeof(t_token));
-	token->type = type;
-	token->value = value;
-	token->next = NULL;
-	return (token);
+    t_token *token;
+    
+    token = safe_malloc(sizeof(t_token));
+    if (!token)
+        return (NULL);
+    
+    token->type = type;
+    token->value = value;
+    token->next = NULL;
+    token->prev = NULL;  // Inizializza esplicitamente prev a NULL
+    
+    return (token);
 }
 
-void	add_token(t_token **tokens, t_token *new)
+void add_token(t_token **tokens, t_token *new)
 {
-	t_token	*tmp;
+    t_token *tmp;
 
-	if (!*tokens)
-		*tokens = new;
-	else
-	{
-		tmp = *tokens;
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = new;
-		new->prev = tmp;
-	}
+    if (!tokens || !new)
+        return;
+        
+    if (!*tokens)
+        *tokens = new;
+    else
+    {
+        tmp = *tokens;
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = new;
+        new->prev = tmp;  // Aggiunge il collegamento al prev
+    }
 }

@@ -58,7 +58,7 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
-void add_new_env_var(t_minishell *shell, char *env_string)
+void	add_new_env_var(t_minishell *shell, char *env_string)
 {
 	int		i;
 	int		j;
