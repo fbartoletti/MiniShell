@@ -11,7 +11,7 @@ SRCS = main/main.c \
        parser/quote_handler.c \
        utils/art.c \
        utils/utils.c \
-       utils/utils_string.c \
+       utils/utils_env.c \
        utils/expander_utils.c \
        utils/lexer_utils.c \
        utils/quote_handler_utils.c \
@@ -30,8 +30,9 @@ SRCS = main/main.c \
        utils/token_utils.c \
        utils/heredoc_utils.c \
        utils/heredoc_util.c \
-       utils/exit_utils.c \
        utils/executor_redir_utils.c \
+       utils/utils_free.c \
+       utils/utils_str.c \
        executor/exec.c \
        executor/exe.c \
        executor/executor.c \

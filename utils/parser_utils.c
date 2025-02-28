@@ -12,11 +12,10 @@
 
 #include "../include/minishell.h"
 
-
-t_redirect_node *create_redirect(t_redirect type, char *file)
+t_redirect_node	*create_redirect(t_redirect type, char *file)
 {
-	t_redirect_node *redir;
-	
+	t_redirect_node	*redir;
+
 	redir = alloc_mem(sizeof(t_redirect_node));
 	if (!redir)
 		return (NULL);
@@ -30,8 +29,6 @@ t_redirect_node *create_redirect(t_redirect type, char *file)
 	redir->heredoc = NULL;
 	redir->next = NULL;
 	redir->prev = NULL;
-	
-	// Se è un heredoc, inizializza la struttura heredoc
 	if (type.is_heredoc)
 	{
 		redir->heredoc = alloc_mem(sizeof(t_heredoc_data));
@@ -49,18 +46,17 @@ t_redirect_node *create_redirect(t_redirect type, char *file)
 			redir->heredoc->expand = TRUE;
 		redir->heredoc->index = 0;
 	}
-	
 	return (redir);
 }
 
-void add_redirect(t_command_info *cmd, t_redirect_node *redir)
+void	add_redirect(t_command_info *cmd, t_redirect_node *redir)
 {
-	t_redirect_node *tmp;
-	
+	t_redirect_node	*tmp;
+
 	if (!cmd->redirects)
 	{
 		cmd->redirects = redir;
-		redir->prev = redir;  // Lista circolare
+		redir->prev = redir;
 	}
 	else
 	{
@@ -69,37 +65,33 @@ void add_redirect(t_command_info *cmd, t_redirect_node *redir)
 			tmp = tmp->next;
 		tmp->next = redir;
 		redir->prev = tmp;
-		cmd->redirects->prev = redir;  // Aggiorna il prev del primo nodo
+		cmd->redirects->prev = redir;
 	}
 }
 
-// Funzione per generare un nome di file temporaneo per heredoc
-char *generate_heredoc_filename(int index)
+char	*generate_heredoc_filename(int index)
 {
-	char *index_str;
-	char *temp;
-	char *filename;
-	
+	char	*index_str;
+	char	*temp;
+	char	*filename;
+
 	index_str = ft_itoa(index);
 	temp = ft_strjoin(".here_doc_", index_str);
 	free(index_str);
-	
 	if (!temp)
 		return (NULL);
-		
 	filename = ft_strjoin(temp, ".tmp");
 	free(temp);
-	
 	return (filename);
 }
 
-// Funzione per preparare tutti gli heredoc nei comandi
 int prepare_heredocs(t_terminal *term)
 {
-	t_command_info *cmd;
-	t_redirect_node *redir;
-	static int heredoc_index = 0;
-	
+	t_command_info	*cmd;
+	t_redirect_node	*redir;
+	static int	heredoc_index;
+
+	heredoc_index = 0;
 	cmd = term->commands;
 	while (cmd)
 	{
@@ -114,7 +106,6 @@ int prepare_heredocs(t_terminal *term)
 				
 				if (!redir->heredoc->temp_filename)
 					return (0);
-					
 				// Qui potrebbe essere chiamata una funzione per leggere l'input dell'heredoc
 				// handle_heredoc_input(redir, term);
 			}
@@ -122,6 +113,5 @@ int prepare_heredocs(t_terminal *term)
 		}
 		cmd = cmd->next;
 	}
-	
 	return (1);
 }

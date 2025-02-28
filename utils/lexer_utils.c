@@ -14,11 +14,11 @@
 
 int is_special_char(char c)
 {
-    return (c == '|' || c == '<' || c == '>');
+	return (c == '|' || c == '<' || c == '>');
 }
 
 int is_whitespace(char c)
 {
-    return (c == ' ' || c == '\t' || c == '\n' || 
-            c == '\v' || c == '\f' || c == '\r');
+	return (c == ' ' || c == '\t' || c == '\n' || 
+			c == '\v' || c == '\f' || c == '\r');
 }

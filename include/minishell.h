@@ -334,11 +334,23 @@ void			cleanup_resources(void);
 // se faccio export vedere se la variabile e gia presente
 // ri implementare heredoc e mettere apposto quelli multipli
 // sitemare errore 2 token vicini (> >, >> >> ecc)
-// sistemare del tutto la norma: 
+
+	// sistemare del tutto la norma: 
 // run_commands
 // execute_pipeline
 // main
 // process_input_line
 // process_quote
 // process_special
+// update_env_list_after_unset
+// free_redirect_node
+// process_heredoc_delimiter
+// read_heredoc_content
+// setup_redirection
+// find_cmd_path
+// process_heredoc_contents
+// process_arguments_to_commands
+// create_redirect
+// handle_heredoc_delimiter
+// update_env_var
 // 
