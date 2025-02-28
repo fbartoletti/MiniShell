@@ -162,6 +162,7 @@ void        cleanup_memory(t_terminal *term);
 /* art.c */
 size_t		ft_strcspn(const char *str, const char *reject);
 void		art();
+
 /* signal.c */
 void        setup_interactive_signals(void);
 void        ignore_signals(void);
@@ -179,6 +180,11 @@ void        add_cmd(t_command_info **cmds, t_command_info *new);
 void        process_redirections(t_command_info *cmd, t_argument *token);
 t_redirect_node *create_redirect(t_redirect type, char *file);
 void        add_redirect(t_command_info *cmd, t_redirect_node *redirect);
+int         is_redir_token(t_token_info token);
+void        add_command_to_shell(t_terminal *term, t_command_info *cmd);
+t_argument *process_quote(char *input, int *i, char quote, t_argument **args);
+t_argument *process_special(char *input, int *i, t_argument **args);
+t_argument *process_word(char *input, int *i, t_argument **args);
 
 /* expansion.c */
 char        *expand_vars(t_terminal *term, char *str);
@@ -207,6 +213,54 @@ char        *concat_strings(const char *s1, const char *s2);
 int         str_compare(const char *s1, const char *s2);
 void        add_to_history(t_terminal *term);
 void        display_art(void);
+int	        is_special_char(char c);
+int	        is_whitespace(char c);
+int	        ft_strcmp(const char *s1, const char *s2);
+char	    *ft_strcpy(char *dest, const char *src);
+int         process_arguments_to_commands(t_terminal *term);
+void        process_expansions(t_terminal *term);
+char        *generate_heredoc_filename(int index);
+int         setup_redirection(t_redirect_node *redir, t_terminal *term);
+char        *get_env_from_array(char **env, const char *name);
+void        check_cmd_exists(char *cmd_path, char *cmd);
+void        update_env_list_after_unset(t_terminal *term, char **args);
+int         handle_export_error(char *name, char *value);
+int         is_valid_identifier(const char *name);
+int	        extract_name_value(char *arg, char **name, char **value);
+int         export_handle_arg(t_terminal *term, char *arg);
+void	    print_export_var(char *var);
+int         print_export_env(t_terminal *term);
+char        *create_env_string(char *name, char *value);
+void	    sort_env_array(char **env, int size);
+int	        ft_export_create_or_update_env(t_terminal *term, char *name, char *env_string);
+int	        ft_export_print_env(t_terminal *term);
+int	        handle_no_equal(t_terminal *term, char *name, char *value);
+int	        handle_error(char *name, char *value);
+t_redirect_node *create_heredoc_queue(void);
+void	    add_to_heredoc_queue(t_redirect_node **queue, char *delimiter);
+char	    *process_heredoc_queue(t_terminal *term, t_redirect_node *queue);
+void	    export_env_var(t_terminal *term, const char *var_name, const char *value);
+void	    update_pwd_env(t_terminal *term, const char *old_pwd);
+char        *create_quoted_value(char *value, char quote);
+void	    execute_child_process(t_terminal *term, t_command_info *cmd);
+int	        expand_command_args(t_terminal *term, t_command_info *cmd);
+int	        handle_heredoc_delimiter(char *input, int *i, t_argument **args);
+int	        create_special_token(t_argument **args, char *value, t_token_info type);
+t_token_info    get_token_type(char *input, int i, int *len);
+void	    free_heredoc_list(t_redirect_node *list);
+char	    *process_heredoc_contents(t_terminal *term, t_redirect_node *redirects);
+void	    add_heredoc_node(t_redirect_node **list, t_redirect_node *new);
+t_redirect_node	*create_heredoc_node(char *delimiter);
+void	    handle_redirections(t_command_info *cmd);
+int	        execute_builtin(t_terminal *term, t_command_info *cmd);
+void	    setup_pipes(int prev_pipe, int *pipe_fd);
+void	    save_io_descriptors(int *saved_stdin, int *saved_stdout);
+int	        count_valid_commands(t_command_info *cmd);
+void	    wait_for_processes(int cmd_count);
+void	    init_pipe_fds(int *pipe_fd, int *prev_pipe);
+void	    close_pipe_fds(int *pipe_fd, int prev_pipe);
+int	        change_directory(char *absolute_path, char *path, char *old_pwd);
+int	        is_numeric(char *str);
 
 /* executor.c */
 void        run_commands(t_terminal *term);
@@ -253,6 +307,7 @@ int         cmd_exit(t_terminal *term, char **args);
 int         cmd_export(t_terminal *term, char **args);
 int         cmd_unset(t_terminal *term, char **args);
 int         cmd_env(t_terminal *term, char **args);
+int	        ft_cd_handle_path(t_terminal *term, char **args, char **path, char **old_pwd);
 
 /* environment.c */
 void        init_environment(t_terminal *term, char **env);
@@ -273,10 +328,5 @@ void        cleanup_child(t_terminal *term);
 
 #endif
 
-/* TO DO LIST */
-// sistemare pipe
-// correggere > output heredoc
-// << << airdoc sensa arg deve dare errore 
-// << EOF << airdoc concatenati ctr d chiude uno alla volta da sinistra a destra 
-// << EOF | << EOF airdoc con pipe concatenate
-// rivisita read_heredoc_input e handle_heredoc e process_hdoc_content
+        /* TO DO LIST */
+// sistemare del tutto la norma 

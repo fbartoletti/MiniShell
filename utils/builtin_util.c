@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/07 15:57:15 by barto             #+#    #+#             */
-/*   Updated: 2025/02/12 09:35:45 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/27 10:39:56 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,15 @@ void	sort_env_array(char **env, int size)
 			j++;
 		}
 		if (!swapped)
-			break;
+			break ;
 		i++;
 	}
 }
+
 void	print_export_var(char *var)
 {
 	char	*equal_sign;
-	int	len;
+	int		len;
 
 	ft_putstr_fd("declare -x ", 1);
 	equal_sign = ft_strchr(var, '=');
@@ -59,13 +60,13 @@ void	print_export_var(char *var)
 		ft_putstr_fd(var, 1);
 	ft_putchar_fd('\n', 1);
 }
+
 int	is_valid_identifier(const char *name)
 {
 	int	i;
 
 	if (!name || !*name || (!ft_isalpha(*name) && *name != '_'))
 		return (0);
-	
 	i = 0;
 	while (name[i])
 	{
@@ -76,21 +77,20 @@ int	is_valid_identifier(const char *name)
 	return (1);
 }
 
-int	execute_builtin_command(t_minishell *shell, t_command *cmd)
+void	execute_builtin_command(t_terminal *term, t_command_info *cmd)
 {
-	if (!ft_strcmp(cmd->args[0], "echo"))
-		return (ft_echo(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "cd"))
-		return (ft_cd(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "pwd"))
-		return (ft_pwd(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "export"))
-		return (ft_export(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "unset"))
-		return (ft_unset(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "env"))
-		return (ft_env(shell, cmd->args));
-	if (!ft_strcmp(cmd->args[0], "exit"))
-		return (ft_exit(shell, cmd->args));
-	return (1);
+	if (!ft_strcmp(cmd->matrix[0], "echo"))
+		g_last_status = cmd_echo(term, cmd->matrix);
+	else if (!ft_strcmp(cmd->matrix[0], "cd"))
+		g_last_status = cmd_cd(term, cmd->matrix);
+	else if (!ft_strcmp(cmd->matrix[0], "pwd"))
+		g_last_status = cmd_pwd(term, cmd->matrix);
+	else if (!ft_strcmp(cmd->matrix[0], "export"))
+		g_last_status = cmd_export(term, cmd->matrix);
+	else if (!ft_strcmp(cmd->matrix[0], "unset"))
+		g_last_status = cmd_unset(term, cmd->matrix);
+	else if (!ft_strcmp(cmd->matrix[0], "env"))
+		g_last_status = cmd_env(term, cmd->matrix);
+	else if (!ft_strcmp(cmd->matrix[0], "exit"))
+		g_last_status = cmd_exit(term, cmd->matrix);
 }

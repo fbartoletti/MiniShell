@@ -6,16 +6,16 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:35:21 by barto             #+#    #+#             */
-/*   Updated: 2025/02/25 15:56:16 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/27 11:33:12 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	is_builtin(char *cmd)
+int	is_builtin_cmd(char *cmd)
 {
-	const char *builtins[8];
-	int i;
+	const char	*builtins[8];
+	int			i;
 
 	i = 0;
 	builtins[0] = "echo";
@@ -35,39 +35,35 @@ int	is_builtin(char *cmd)
 	return (0);
 }
 
-void	setup_pipes(t_executor *exec)
+void	setup_pipes(int prev_pipe, int *pipe_fd)
 {
-	if (exec->prev_pipe != -1)
+	if (prev_pipe != -1)
 	{
-		dup2(exec->prev_pipe, STDIN_FILENO);
-		close(exec->prev_pipe);
-		exec->prev_pipe = -1;
+		dup2(prev_pipe, STDIN_FILENO);
+		close(prev_pipe);
 	}
-	if (exec->pipe_fd[1] != -1)
+	if (pipe_fd[1] != -1)
 	{
-		dup2(exec->pipe_fd[1], STDOUT_FILENO);
-		close(exec->pipe_fd[1]);
-		exec->pipe_fd[1] = -1;
+		dup2(pipe_fd[1], STDOUT_FILENO);
+		close(pipe_fd[1]);
 	}
 }
 
-void	execute_external(t_minishell *shell, t_command *cmd)
+void	run_external_command(t_terminal *term, t_command_info *cmd)
 {
 	char	*cmd_path;
 
-	if (!cmd->args || !cmd->args[0])
-	{
+	if (!cmd->matrix || !cmd->matrix[0])
 		exit(0);
-	}
-	cmd_path = find_command_path(shell, cmd->args[0]);
+	cmd_path = find_cmd_path(term, cmd->matrix[0]);
 	if (!cmd_path)
 	{
 		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(cmd->args[0], 2);
+		ft_putstr_fd(cmd->matrix[0], 2);
 		ft_putendl_fd(": command not found", 2);
 		exit(127);
 	}
-	if (execve(cmd_path, cmd->args, shell->env) == -1)
+	if (execve(cmd_path, cmd->matrix, term->new_env) == -1)
 	{
 		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(strerror(errno), 2);
@@ -79,32 +75,42 @@ void	execute_external(t_minishell *shell, t_command *cmd)
 	exit(1);
 }
 
-int	execute_builtin(t_minishell *shell, t_command *cmd)
+int	execute_builtin(t_terminal *term, t_command_info *cmd)
 {
 	int	saved_stdin;
 	int	saved_stdout;
 	int	ret;
 
-	if (cmd->redirs)
-	{
-		if (setup_builtin_redirections(cmd, &saved_stdin, &saved_stdout, shell) < 0)
-			return (1);
-	}
-	ret = execute_builtin_command(shell, cmd);
-	if (cmd->redirs)
-		restore_redirections(saved_stdin, saved_stdout);
+	saved_stdin = dup(STDIN_FILENO);
+	saved_stdout = dup(STDOUT_FILENO);
+	if (saved_stdin < 0 || saved_stdout < 0)
+		return (1);
+	setup_input_redirects(cmd->redirects);
+	setup_output_redirects(cmd->redirects);
+	execute_builtin_command(term, cmd);
+	ret = g_last_status;
+	dup2(saved_stdin, STDIN_FILENO);
+	dup2(saved_stdout, STDOUT_FILENO);
+	close(saved_stdin);
+	close(saved_stdout);
 	return (ret);
 }
 
-void	handle_redirections(t_command *cmd, t_minishell *shell)
+void	handle_redirections(t_command_info *cmd)
 {
-	t_redir	*redir;
+	t_redirect_node	*redir;
 
-	redir = cmd->redirs;
+	redir = cmd->redirects;
 	while (redir)
 	{
-		if (setup_redirection(redir, shell) < 0)
-			exit(1);
+		if (redir->type.is_heredoc)
+			handle_heredoc_redirect(redir);
+		else if (redir->type.is_infile)
+			handle_input_redirect(redir);
+		else if (redir->type.is_outfile)
+			handle_output_redirect(redir);
+		else if (redir->type.is_append)
+			handle_append_redirect(redir);
 		redir = redir->next;
 	}
 }

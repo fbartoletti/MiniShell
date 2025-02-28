@@ -6,57 +6,43 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 11:49:38 by barto             #+#    #+#             */
-/*   Updated: 2025/02/25 14:58:49 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/27 10:48:32 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	expand_command_args(t_minishell *shell, t_command *cmd)
+int	expand_command_args(t_terminal *term, t_command_info *cmd)
 {
 	int		i;
 	char	*expanded;
 
 	i = 0;
-	while (cmd->args[i])
+	while (cmd->matrix[i])
 	{
-		expanded = expand_variables(shell, cmd->args[i]);
+		expanded = expand_vars(term, cmd->matrix[i]);
 		if (expanded)
 		{
-			free(cmd->args[i]);
-			cmd->args[i] = expanded;
+			free(cmd->matrix[i]);
+			cmd->matrix[i] = expanded;
 		}
 		i++;
 	}
 	return (0);
 }
 
-void	execute_child_process(t_minishell *shell, t_command *cmd, t_executor *exec)
+void	execute_child_process(t_terminal *term, t_command_info *cmd)
 {
-	handle_child_signals();
-	setup_pipes(exec);
-	if (exec->pipe_fd[0] != -1)
-		close(exec->pipe_fd[0]);
-	handle_redirections(cmd, shell);
-	if (!cmd->args || !cmd->args[0])
+	ignore_signals();
+	setup_input_redirects(cmd->redirects);
+	setup_output_redirects(cmd->redirects);
+	if (!cmd->matrix || !cmd->matrix[0])
 		exit(0);
-	if (is_builtin(cmd->args[0]))
-		exit(execute_builtin(shell, cmd));
-	execute_external(shell, cmd);
-	exit(127);
-}
-
-char	*create_quoted_value(char *value, char quote)
-{
-	char	*quoted_value;
-
-	if (quote == '\'')
+	if (cmd->builtin.is_builtin)
 	{
-		quoted_value = ft_strjoin("\1", value);
-		free(value);
-		if (!quoted_value)
-			return (NULL);
-		return (quoted_value);
+		execute_builtin_command(term, cmd);
+		exit(g_last_status);
 	}
-	return (value);
+	run_external_command(term, cmd);
+	exit(127);
 }

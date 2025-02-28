@@ -18,7 +18,7 @@ char	*ft_strdup(const char *s)
 	char	*dup;
 
 	len = ft_strlen(s);
-	dup = safe_malloc(len + 1);
+	dup = alloc_mem(len + 1);
 	if (!dup)
 		return (NULL);
 	return (ft_strcpy(dup, s));
@@ -58,23 +58,92 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
-void	add_new_env_var(t_minishell *shell, char *env_string)
+void	add_new_env_var(t_terminal *term, char *env_string)
 {
 	int		i;
 	int		j;
 	char	**new_env;
 
 	i = 0;
-	while (shell->env[i])
+	while (term->new_env && term->new_env[i])
 		i++;
-	new_env = safe_malloc((i + 2) * sizeof(char *));
+	new_env = alloc_mem((i + 2) * sizeof(char *));
 	j = 0;
 	while (j < i)
 	{
-		new_env[j] = shell->env[j];
+		new_env[j] = term->new_env[j];
 		j++;
 	}
 	new_env[i] = env_string;
 	new_env[i + 1] = NULL;
-	shell->env = new_env;
+	if (term->new_env)
+		free(term->new_env);
+	term->new_env = new_env;
+}
+
+int find_env_var_index(char **env, char *name)
+{
+	int		i;
+	size_t	len;
+
+	if (!env || !name)
+		return (-1);
+
+	i = 0;
+	len = ft_strlen(name);
+	
+	while (env[i])
+	{
+		if (ft_strncmp(env[i], name, len) == 0 && env[i][len] == '=')
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
+char *get_env_var(t_environment *env, const char *name)
+{
+	t_environment *current;
+	
+	if (!env || !name)
+		return (NULL);
+		
+	current = env;
+	while (current)
+	{
+		if (ft_strcmp(current->name, name) == 0)
+			return (current->value);
+		current = current->next;
+	}
+	return (NULL);
+}
+
+void update_env_var(t_terminal *term, const char *name, const char *value)
+{
+	int		index;
+	char	*new_var;
+	char	*temp;
+	
+	if (!term || !name || !value || !term->new_env)
+		return;
+		
+	index = find_env_var_index(term->new_env, (char *)name);
+	
+	if (index >= 0)
+	{
+		temp = ft_strjoin(name, "=");
+		new_var = ft_strjoin(temp, value);
+		free(temp);
+		
+		free(term->new_env[index]);
+		term->new_env[index] = new_var;
+	}
+	else
+	{
+		temp = ft_strjoin(name, "=");
+		new_var = ft_strjoin(temp, value);
+		free(temp);
+		
+		add_new_env_var(term, new_var);
+	}
 }

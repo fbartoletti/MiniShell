@@ -12,12 +12,12 @@
 
 #include "../include/minishell.h"
 
-t_token	*tokenize(char *input)
+t_argument *tokenize_input(char *input)
 {
-	t_token	*tokens;
+	t_argument *args;
 	int i;
 	
-	tokens = NULL;
+	args = NULL;
 	i = 0;
 	while (input[i])
 	{
@@ -25,51 +25,70 @@ t_token	*tokenize(char *input)
 			i++;
 		else if (input[i] == '\'' || input[i] == '"')
 		{
-			if (!handle_quote(input, &i, input[i], &tokens))
-				return (free_tokens(tokens), NULL);
+			if (!process_quote(input, &i, input[i], &args))
+				return (free_arg_tokens(args), NULL);
 		}
 		else if (is_special_char(input[i]))
 		{
-			if (!handle_special(input, &i, &tokens))
-				return (free_tokens(tokens), NULL);
+			if (!process_special(input, &i, &args))
+				return (free_arg_tokens(args), NULL);
 		}
-		else if (!handle_word(input, &i, &tokens))
-			return (free_tokens(tokens), NULL);
+		else if (!process_word(input, &i, &args))
+			return (free_arg_tokens(args), NULL);
 	}
-	return (tokens);
+	return (args);
 }
 
-t_token *create_token(t_token_type type, char *value)
+t_argument *create_arg_token(t_boolean is_token, char *value)
 {
-    t_token *token;
+    t_argument *arg;
     
-    token = safe_malloc(sizeof(t_token));
-    if (!token)
+    arg = alloc_mem(sizeof(t_argument));
+    if (!arg)
         return (NULL);
     
-    token->type = type;
-    token->value = value;
-    token->next = NULL;
-    token->prev = NULL;  // Inizializza esplicitamente prev a NULL
+    arg->index = 0;
+    arg->str = value;
+    arg->token.is_token = is_token;
+    arg->token.is_pipe = FALSE;
+    arg->token.is_infile = FALSE;
+    arg->token.is_outfile = FALSE;
+    arg->token.is_append = FALSE;
+    arg->token.is_heredoc = FALSE;
+    arg->type.is_redirect = FALSE;
+    arg->type.is_infile = FALSE;
+    arg->type.is_outfile = FALSE;
+    arg->type.is_append = FALSE;
+    arg->type.is_heredoc = FALSE;
+    arg->quote.none = TRUE;
+    arg->quote.single = FALSE;
+    arg->quote.dbl = FALSE;
+    arg->chained = FALSE;
+    arg->next = NULL;
+    arg->prev = NULL;
     
-    return (token);
+    return (arg);
 }
 
-void add_token(t_token **tokens, t_token *new)
+void add_arg_token(t_argument **args, t_argument *new)
 {
-    t_token *tmp;
+    t_argument *tmp;
 
-    if (!tokens || !new)
+    if (!args || !new)
         return;
         
-    if (!*tokens)
-        *tokens = new;
+    if (!*args)
+    {
+        *args = new;
+        new->prev = new;  // Il primo nodo punta a se stesso
+    }
     else
     {
-        tmp = *tokens;
+        tmp = *args;
         while (tmp->next)
             tmp = tmp->next;
         tmp->next = new;
-        new->prev = tmp;  // Aggiunge il collegamento al prev
+        new->prev = tmp;
+        (*args)->prev = new;  // Ultimo nodo connesso al primo
     }
 }

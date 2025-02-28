@@ -6,18 +6,18 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:42:25 by barto             #+#    #+#             */
-/*   Updated: 2025/02/11 15:16:54 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/27 12:15:32 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	ft_echo(t_minishell *shell, char **args)
+int	cmd_echo(t_terminal *term, char **args)
 {
 	int	n_flag;
 	int	i;
 
-	(void)shell;
+	(void)term;
 	n_flag = 0;
 	i = 1;
 	if (args[1] && !ft_strcmp(args[1], "-n"))
@@ -37,32 +37,32 @@ int	ft_echo(t_minishell *shell, char **args)
 	return (0);
 }
 
-int	ft_cd_handle_path(t_minishell *shell, char **args, char **path, char **old_pwd)
+int	ft_cd_handle_path(t_terminal *term, char **args, char **path, char **old_pwd)
 {
 	*old_pwd = getcwd(NULL, 0);
 	if (!*old_pwd)
-		return 1;
+		return (1);
 	if (!args[1])
 	{
-		*path = get_env_var(shell->env, "HOME");
+		*path = get_env_var(term->env, "HOME");
 		if (!*path)
 		{
 			free(*old_pwd);
-			return 1;
+			return (1);
 		}
 	}
 	else if (args[1][0] == '\0')
 	{
 		free(*old_pwd);
 		*path = NULL;
-		return 0;
+		return (0);
 	}
 	else
-		*path = ft_strdup(args[1]);
-	return 0;
+		*path = ft_strdup_safe(args[1]);
+	return (0);
 }
 
-int	ft_cd(t_minishell *shell, char **args)
+int	cmd_cd(t_terminal *term, char **args)
 {
 	char	*path;
 	char	*old_pwd;
@@ -71,47 +71,48 @@ int	ft_cd(t_minishell *shell, char **args)
 
 	path = NULL;
 	old_pwd = NULL;
-	ret = ft_cd_handle_path(shell, args, &path, &old_pwd);
+	ret = ft_cd_handle_path(term, args, &path, &old_pwd);
 	if (ret != 0)
-		return ret;
+		return (ret);
 	absolute_path = realpath(path, NULL);
 	if (!absolute_path)
 	{
 		free(path);
-		return 1;
+		return (1);
 	}
 	if (access(absolute_path, F_OK) != 0)
 	{
 		free(absolute_path);
 		free(path);
-		return 1;
+		return (1);
 	}
 	return (change_directory(absolute_path, path, old_pwd));
 }
 
-int	ft_pwd(t_minishell *shell, char **args)
+int	cmd_pwd(t_terminal *term, char **args)
 {
 	char	path[4096];
 
-	(void)shell;
+	(void)term;
 	(void)args;
 	if (!getcwd(path, sizeof(path)))
 	{
-		print_error("pwd: error retrieving current directory");
+		display_error("pwd: error retrieving current directory");
 		return (1);
 	}
 	printf("%s\n", path);
 	return (0);
 }
 
-int	ft_exit(t_minishell *shell, char **args)
+int	cmd_exit(t_terminal *term, char **args)
 {
 	int	status;
 
+	(void)term;
 	ft_putendl_fd("exit", 2);
 	if (!args[1])
 	{
-		status = shell->exit_status;
+		status = g_last_status;
 		exit(status);
 	}
 	if (!is_numeric(args[1]))
@@ -124,7 +125,7 @@ int	ft_exit(t_minishell *shell, char **args)
 	if (args[2])
 	{
 		ft_putendl_fd("exit: too many arguments", 2);
-		shell->exit_status = 1;
+		g_last_status = 1;
 		return (1);
 	}
 	status = ft_atoi(args[1]);

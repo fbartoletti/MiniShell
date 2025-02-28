@@ -6,7 +6,7 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 11:14:23 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 11:14:40 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/27 10:24:15 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,42 @@
 
 int	handle_error(char *name, char *value)
 {
-	print_error("export: not a valid identifier");
+	display_error("export: not a valid identifier");
 	free(name);
 	free(value);
 	return (1);
 }
 
-int	handle_no_equal(t_minishell *shell, char *name, char *value)
+int	handle_no_equal(t_terminal *term, char *name, char *value)
 {
-	if (find_env_index(shell->env, name) == -1)
-		add_new_env_var(shell, ft_strdup(name));
+	if (find_env_var_index(term->new_env, name) == -1)
+		add_new_env_var(term, ft_strdup_safe(name));
 	free(name);
 	free(value);
 	return (0);
 }
 
-t_heredoc_queue *create_heredoc_queue(void)
+t_redirect_node	*create_heredoc_queue(void)
 {
 	return (NULL);
 }
 
-void	add_to_heredoc_queue(t_heredoc_queue **queue, char *delimiter)
+void	add_to_heredoc_queue(t_redirect_node **queue, char *delimiter)
 {
-	t_heredoc_queue	*new;
-	t_heredoc_queue	*current;
+	t_redirect_node	*new;
+	t_redirect_node	*current;
 
-	new = safe_malloc(sizeof(t_heredoc_queue));
-	new->delimiter = ft_strdup(delimiter);
-	new->content = NULL;
+	new = alloc_mem(sizeof(t_redirect_node));
+	new->heredoc = alloc_mem(sizeof(t_heredoc_data));
+	new->heredoc->delimiter = ft_strdup_safe(delimiter);
+	new->heredoc->temp_filename = NULL;
+	new->heredoc->expand = TRUE;
+	new->heredoc->index = 0;
 	new->next = NULL;
 	if (!*queue)
 	{
 		*queue = new;
-		return;
+		return ;
 	}
 	current = *queue;
 	while (current->next)
@@ -54,26 +57,24 @@ void	add_to_heredoc_queue(t_heredoc_queue **queue, char *delimiter)
 	current->next = new;
 }
 
-char	*process_heredoc_queue(t_minishell *shell, t_heredoc_queue *queue)
+char	*process_heredoc_queue(t_terminal *term, t_redirect_node *queue)
 {
-	t_heredoc_queue	*current;
+	t_redirect_node	*current;
 	char			*final_content;
 
 	current = queue;
 	final_content = NULL;
 	while (current)
 	{
-		shell->in_heredoc = 1;
-		current->content = read_heredoc_input(current->delimiter, shell);
-		if (!current->content)
+		current->heredoc->temp_filename = generate_heredoc_filename(
+				current->heredoc->index);
+		if (!handle_heredoc_input(current, term))
 		{
-			shell->in_heredoc = 0;
-			return NULL;
+			return (NULL);
 		}
 		if (!final_content)
-			final_content = current->content;
+			final_content = ft_strdup_safe(current->fd_name);
 		current = current->next;
 	}
-	shell->in_heredoc = 0;
-	return final_content;
+	return (final_content);
 }

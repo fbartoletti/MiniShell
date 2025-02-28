@@ -6,49 +6,56 @@
 /*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:29:56 by barto             #+#    #+#             */
-/*   Updated: 2025/02/11 14:35:25 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/27 10:57:43 by barto            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-t_token_type	get_token_type(char *input, int i, int *len)
+t_token_info	get_token_type(char *input, int i, int *len)
 {
+	t_token_info	token;
+
+	ft_memset(&token, 0, sizeof(t_token_info));
+	token.is_token = TRUE;
 	if (input[i] == '<' && input[i + 1] == '<')
 	{
 		*len = 2;
-		return (TOKEN_HEREDOC);
+		token.is_heredoc = TRUE;
 	}
-	if (input[i] == '>' && input[i + 1] == '>')
+	else if (input[i] == '>' && input[i + 1] == '>')
 	{
 		*len = 2;
-		return (TOKEN_REDIR_APPEND);
+		token.is_append = TRUE;
 	}
-	if (input[i] == '<')
-		return (TOKEN_REDIR_IN);
-	if (input[i] == '>')
-		return (TOKEN_REDIR_OUT);
-	return (TOKEN_PIPE);
+	else if (input[i] == '<')
+		token.is_infile = TRUE;
+	else if (input[i] == '>')
+		token.is_outfile = TRUE;
+	else
+		token.is_pipe = TRUE;
+	return (token);
 }
 
-int	create_special_token(t_token **tokens, char *value, t_token_type type)
+int	create_special_token(t_argument **args, char *value, t_token_info type)
 {
-	t_token	*new_token;
+	t_argument	*new_token;
 
 	if (!value)
 		return (0);
-	new_token = create_token(type, value);
+	new_token = create_arg_token(TRUE, value);
 	if (!new_token)
 		return (0);
-	add_token(tokens, new_token);
+	new_token->token = type;
+	add_arg_token(args, new_token);
 	return (1);
 }
 
-int	handle_heredoc_delimiter(char *input, int *i, t_token **tokens)
+int	handle_heredoc_delimiter(char *input, int *i, t_argument **args)
 {
-	int		start;
-	char	*value;
-	int		quote_mode;
+	int			start;
+	char		*value;
+	t_boolean	quote_mode;
 
 	while (input[*i] && is_whitespace(input[*i]))
 		(*i)++;
@@ -64,6 +71,20 @@ int	handle_heredoc_delimiter(char *input, int *i, t_token **tokens)
 	value = ft_substr(input, start, *i - start);
 	if (!value)
 		return (0);
-	add_token(tokens, create_token(TOKEN_WORD, value));
+	
+	t_argument *new_arg = create_arg_token(FALSE, value);
+	if (!new_arg)
+	{
+		free(value);
+		return (0);
+	}
+	
+	if (quote_mode)
+	{
+		new_arg->quote.none = FALSE;
+		new_arg->quote.single = TRUE;
+	}
+	
+	add_arg_token(args, new_arg);
 	return (1);
 }
