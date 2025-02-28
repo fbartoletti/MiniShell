@@ -37,6 +37,7 @@ SRCS = main/main.c \
        executor/executor.c \
        executor/signals.c \
        executor/executor_redir.c \
+       executor/environment.c \
        parser/process.c \
        builtin/builtin.c \
 

@@ -66,8 +66,18 @@ void free_cmd_list(t_command_info *cmd)
     if (!cmd)
         return;
     
+    // Rompi il ciclo nella lista circolare
     if (cmd->prev == cmd)
-        cmd->prev = NULL;
+    {
+        // Lista con un solo elemento
+        free_cmd_content(cmd);
+        free(cmd);
+        return;
+    }
+    
+    // Lista con più elementi
+    cmd->prev->next = NULL;  // Rompi il ciclo
+    
     while (cmd)
     {
         tmp = cmd->next;

@@ -16,18 +16,49 @@ void free_redirect_node(t_redirect_node *redir)
 {
     t_redirect_node *tmp;
 
-    while (redir)
-    {
-        tmp = redir->next;
-        free(redir->fd_name);
+    if (!redir)
+        return;
         
+    // Rompi il ciclo nella lista circolare
+    if (redir->prev == redir)
+    {
+        // Lista con un solo elemento
+        if (redir->fd_name)
+            free(redir->fd_name);
+            
         if (redir->heredoc)
         {
             if (redir->heredoc->delimiter)
                 free(redir->heredoc->delimiter);
             if (redir->heredoc->temp_filename)
             {
-                // Rimuovi anche il file temporaneo se esiste
+                if (access(redir->heredoc->temp_filename, F_OK) == 0)
+                    unlink(redir->heredoc->temp_filename);
+                free(redir->heredoc->temp_filename);
+            }
+            free(redir->heredoc);
+        }
+        
+        free(redir);
+        return;
+    }
+    
+    // Lista con più elementi
+    redir->prev->next = NULL;  // Rompi il ciclo
+    
+    while (redir)
+    {
+        tmp = redir->next;
+        
+        if (redir->fd_name)
+            free(redir->fd_name);
+            
+        if (redir->heredoc)
+        {
+            if (redir->heredoc->delimiter)
+                free(redir->heredoc->delimiter);
+            if (redir->heredoc->temp_filename)
+            {
                 if (access(redir->heredoc->temp_filename, F_OK) == 0)
                     unlink(redir->heredoc->temp_filename);
                 free(redir->heredoc->temp_filename);
@@ -53,12 +84,18 @@ void free_cmd_content(t_command_info *cmd)
         while (cmd->matrix[i])
         {
             free(cmd->matrix[i]);
+            cmd->matrix[i] = NULL;  // Previeni use-after-free
             i++;
         }
         free(cmd->matrix);
+        cmd->matrix = NULL;  // Previeni use-after-free
     }
     
-    free_redirect_node(cmd->redirects);
+    if (cmd->redirects)
+    {
+        free_redirect_node(cmd->redirects);
+        cmd->redirects = NULL;  // Previeni use-after-free
+    }
 }
 
 void free_env_list(t_environment **env)
@@ -110,4 +147,15 @@ void cleanup_child(t_terminal *term)
         close(term->stdout_copy);
         term->stdout_copy = -1;
     }
+}
+
+void cleanup_resources(void)
+{
+    // Attendi tutti i processi figli zombie
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+    
+    // Chiudi tutti i file descriptor aperti (opzionale, ma utile)
+    int fd;
+    for (fd = 3; fd < 1024; fd++)
+        close(fd);
 }

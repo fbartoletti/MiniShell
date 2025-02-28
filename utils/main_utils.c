@@ -82,11 +82,13 @@ void cleanup_memory(t_terminal *term)
         free_arg_tokens(term->args);
         term->args = NULL;
     }
+    
     if (term->commands)
     {
         free_cmd_list(term->commands);
         term->commands = NULL;
     }
+    
     if (term->path)
     {
         free_string_array(term->path);

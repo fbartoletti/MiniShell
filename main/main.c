@@ -76,23 +76,32 @@ int main(int ac, char **av, char **env)
     
     (void)ac;
     (void)av;
+    
     init_terminal(&term, env);
     art();
+    
     while (1)
     {
         line = readline("minishell> ");
-        if (!line)
+        
+        if (!line) // Ctrl+D
+        {
+            printf("\nexit shell ...\n");
             break;
-        if (strlen(line) > 0)
+        }
+        
+        if (line[0] != '\0') // Riga non vuota
         {
             term.line = line;
             process_line(&term, line);
             if (term.add_to_history)
                 add_history(line);
         }
+        
         free(line);
+        line = NULL;
     }
-    printf("\nexit shell ...\n");
+    
     free_terminal(&term);
     return (g_last_status);
 }

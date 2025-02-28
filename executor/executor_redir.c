@@ -14,18 +14,28 @@
 
 void restore_io(t_terminal *term)
 {
-    if (dup2(term->stdin_copy, STDIN_FILENO) == -1)
-        perror("dup2 stdin_copy");
-    if (dup2(term->stdout_copy, STDOUT_FILENO) == -1)
-        perror("dup2 stdout_copy");
-    close(term->stdin_copy);
-    close(term->stdout_copy);
+    if (term->stdin_copy != -1)
+    {
+        dup2(term->stdin_copy, STDIN_FILENO);
+        close(term->stdin_copy);
+        term->stdin_copy = -1;
+    }
+    
+    if (term->stdout_copy != -1)
+    {
+        dup2(term->stdout_copy, STDOUT_FILENO);
+        close(term->stdout_copy);
+        term->stdout_copy = -1;
+    }
 }
 
 void setup_input_redirects(t_redirect_node *redir)
 {
     t_redirect_node *node;
-
+    
+    if (!redir)
+        return;
+        
     node = redir;
     while (node)
     {
@@ -40,13 +50,16 @@ void setup_input_redirects(t_redirect_node *redir)
 void setup_output_redirects(t_redirect_node *redir)
 {
     t_redirect_node *node;
-
+    
+    if (!redir)
+        return;
+        
     node = redir;
     while (node)
     {
         if (node->type.is_outfile)
             handle_output_redirect(node);
-        if (node->type.is_append)
+        else if (node->type.is_append)
             handle_append_redirect(node);
         node = node->next;
     }

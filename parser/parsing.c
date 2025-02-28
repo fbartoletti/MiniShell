@@ -14,6 +14,7 @@
 
 void add_command_to_shell(t_terminal *term, t_command_info *cmd)
 {
+    identify_builtin(cmd);
     if (!term->commands)
     {
         term->commands = cmd;
@@ -61,7 +62,6 @@ static void handle_word_token(t_command_info *cmd, char *word)
 
 int handle_token(t_terminal *term, t_argument *arg, t_command_info *cmd)
 {
-    // Controllo di sicurezza all'inizio della funzione
     if (!arg || !cmd)
         return (0);
 
@@ -69,7 +69,12 @@ int handle_token(t_terminal *term, t_argument *arg, t_command_info *cmd)
     {
         if (!cmd->matrix && !cmd->redirects)
             return (display_error(ERR_PIPE), 0);
+            
+        // Importante: identificare il tipo di comando prima di aggiungerlo
+        identify_builtin(cmd);
         add_command_to_shell(term, cmd);
+        
+        // Ritorna 1 per indicare che è stato aggiunto un nuovo comando
         return (1);
     }
     else if (is_redir_token(arg->token))
@@ -115,12 +120,23 @@ int process_input_line(t_terminal *term, char *line)
         
         if (ret == 2 && current->next)
             current = current->next->next;
+        else if (ret == 1 && current->token.is_pipe)
+        {
+            // Dopo una pipe, crea un nuovo comando
+            cmd = create_cmd();
+            if (!cmd)
+                return (0);
+            current = current->next;
+        }
         else
             current = current->next;
     }
     
     if (cmd->matrix || cmd->redirects)
+    {
+        identify_builtin(cmd);
         add_command_to_shell(term, cmd);
+    }
     else
     {
         free_cmd_content(cmd);

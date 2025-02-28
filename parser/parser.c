@@ -60,3 +60,34 @@ int is_redir_token(t_token_info token)
     return (token.is_infile || token.is_outfile || 
             token.is_append || token.is_heredoc);
 }
+
+void process_redirections(t_command_info *cmd, t_argument *token)
+{
+    t_redirect type;
+    
+    // Inizializza il tipo di redirezione
+    ft_memset(&type, 0, sizeof(t_redirect));
+    type.is_redirect = TRUE;
+    
+    // Imposta il tipo specifico di redirezione
+    if (token->token.is_infile)
+        type.is_infile = TRUE;
+    else if (token->token.is_outfile)
+        type.is_outfile = TRUE;
+    else if (token->token.is_append)
+        type.is_append = TRUE;
+    else if (token->token.is_heredoc)
+        type.is_heredoc = TRUE;
+    
+    // Vai avanti fino al token del file
+    token = token->next;
+    if (!token)
+        return;
+    
+    // Crea un nodo di redirezione e aggiungilo al comando
+    t_redirect_node *redirect = create_redirect(type, token->str);
+    if (redirect)
+    {
+        add_redirect(cmd, redirect);
+    }
+}

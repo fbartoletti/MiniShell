@@ -94,3 +94,18 @@ void	execute_builtin_command(t_terminal *term, t_command_info *cmd)
 	else if (!ft_strcmp(cmd->matrix[0], "exit"))
 		g_last_status = cmd_exit(term, cmd->matrix);
 }
+
+void identify_builtin(t_command_info *cmd)
+{
+    if (!cmd || !cmd->matrix || !cmd->matrix[0])
+        return;
+        
+    cmd->builtin.is_builtin = is_builtin_cmd(cmd->matrix[0]);
+    cmd->builtin.is_echo = (ft_strcmp(cmd->matrix[0], "echo") == 0);
+    cmd->builtin.is_cd = (ft_strcmp(cmd->matrix[0], "cd") == 0);
+    cmd->builtin.is_pwd = (ft_strcmp(cmd->matrix[0], "pwd") == 0);
+    cmd->builtin.is_export = (ft_strcmp(cmd->matrix[0], "export") == 0);
+    cmd->builtin.is_unset = (ft_strcmp(cmd->matrix[0], "unset") == 0);
+    cmd->builtin.is_env = (ft_strcmp(cmd->matrix[0], "env") == 0);
+    cmd->builtin.is_exit = (ft_strcmp(cmd->matrix[0], "exit") == 0);
+}

@@ -12,38 +12,35 @@
 
 #include "../include/minishell.h"
 
-static void	signal_ignore_handler(int signum);
-
-void	setup_interactive_signals(void)
+void setup_interactive_signals(void)
 {
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, signal_handler);
-	signal(SIGTERM, signal_handler);
+    struct sigaction sa;
+    
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    
+    sigaction(SIGINT, &sa, NULL);
+    signal(SIGQUIT, SIG_IGN);
 }
 
-void	signal_handler(int signum)
+void signal_handler(int signum)
 {
-	if (signum == SIGINT)
-	{
-		g_last_status = 1;
-		printf("\n");
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_redisplay();
-	}
-	else if (signum == SIGTERM)
-		exit(0);
+    if (signum == SIGINT)
+    {
+        g_last_status = 1;
+        write(1, "\n", 1);
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
 }
 
-void	ignore_signals(void)
-{
-	signal(SIGINT, signal_ignore_handler);
-	signal(SIGTERM, signal_ignore_handler);
-}
 
-static void	signal_ignore_handler(int signum)
+void ignore_signals(void)
 {
-	(void)signum;
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
 }
 
 void	handle_exec_signals(int signum)

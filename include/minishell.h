@@ -325,7 +325,7 @@ void        free_env_list(t_environment **env);
 void        free_redirect_node(t_redirect_node *redir);
 void        free_cmd_content(t_command_info *cmd);
 void        cleanup_child(t_terminal *term);
-
+void        cleanup_resources(void);
 #endif
 
         /* TO DO LIST */
