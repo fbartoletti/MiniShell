@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   quote_handler.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:53:59 by barto             #+#    #+#             */
-/*   Updated: 2025/01/07 13:20:13 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/28 14:20:20 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ char	*handle_quote_parsing(t_terminal *term, char *str)
 {
 	char	*result;
 	int		i;
-	
+
 	result = alloc_mem(1);
 	i = 0;
 	result[0] = '\0';

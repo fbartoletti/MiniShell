@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_redir.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbartole <fbartole@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:13:44 by barto             #+#    #+#             */
-/*   Updated: 2025/02/17 09:23:39 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/02/28 14:20:54 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	restore_io(t_terminal *term)
 void	setup_input_redirects(t_redirect_node *redir)
 {
 	t_redirect_node	*node;
-	
+
 	if (!redir)
 		return;
 		

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:52:55 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 12:12:31 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/28 14:19:22 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char	*expand_vars(t_terminal *term, char *str)
 {
 	char	*result;
 	int		i;
-	
+
 	if (!str)
 		return (NULL);
 	if (str[0] == '\1')

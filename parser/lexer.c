@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:48:19 by barto             #+#    #+#             */
-/*   Updated: 2025/02/12 18:29:47 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/28 14:19:38 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_argument	*tokenize_input(char *input)
 {
 	t_argument	*args;
 	int			i;
-	
+
 	args = NULL;
 	i = 0;
 	while (input[i])
@@ -42,7 +42,7 @@ t_argument	*tokenize_input(char *input)
 t_argument	*create_arg_token(t_boolean is_token, char *value)
 {
 	t_argument	*arg;
-	
+
 	arg = alloc_mem(sizeof(t_argument));
 	if (!arg)
 		return (NULL);

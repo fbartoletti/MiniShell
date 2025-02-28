@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer.c                                            :+:      :+:    :+:   */
+/*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:48:19 by barto             #+#    #+#             */
-/*   Updated: 2025/02/12 18:29:47 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/28 14:20:05 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ t_argument	*process_special(char *input, int *i, t_argument **args)
 	{
 		if (value[1] == '<')
 			arg->token.is_heredoc = TRUE;
-		else  // 
+		else
 			arg->token.is_infile = TRUE;
 	}
 	else if (c == '>')

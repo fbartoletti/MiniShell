@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   environment.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbartole <fbartole@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 12:00:00 by fbartole          #+#    #+#             */
-/*   Updated: 2025/02/28 12:30:00 by fbartole         ###   ########.fr       */
+/*   Updated: 2025/02/28 14:20:27 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	create_env_node(t_terminal *term, char *var)
 {
 	t_environment	*node;
 	char			*equal_sign;
-	
+
 	node = (t_environment *)alloc_mem(sizeof(t_environment));
 	node->var = ft_strdup_safe(var);
 	equal_sign = ft_strchr(var, '=');

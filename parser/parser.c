@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:05:53 by barto             #+#    #+#             */
-/*   Updated: 2025/01/09 10:27:26 by barto            ###   ########.fr       */
+/*   Updated: 2025/02/28 14:19:41 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 t_command_info	*create_cmd(void)
 {
 	t_command_info	*cmd;
-	
+
 	cmd = alloc_mem(sizeof(t_command_info));
 	if (!cmd)
 		return (NULL);
