@@ -326,9 +326,14 @@ void			free_redirect_node(t_redirect_node *redir);
 void			free_cmd_content(t_command_info *cmd);
 void			cleanup_child(t_terminal *term);
 void			cleanup_resources(void);
+
 #endif
 
 		/* TO DO LIST */
+// implementa unset che ti leva le variabili ambiente nell'expander
+// se faccio export vedere se la variabile e gia presente
+// ri implementare heredoc e mettere apposto quelli multipli
+// sitemare errore 2 token vicini (> >, >> >> ecc)
 // sistemare del tutto la norma: 
 // run_commands
 // execute_pipeline
