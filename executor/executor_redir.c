@@ -12,55 +12,53 @@
 
 #include "../include/minishell.h"
 
-void restore_io(t_terminal *term)
+void	restore_io(t_terminal *term)
 {
-    if (term->stdin_copy != -1)
-    {
-        dup2(term->stdin_copy, STDIN_FILENO);
-        close(term->stdin_copy);
-        term->stdin_copy = -1;
-    }
-    
-    if (term->stdout_copy != -1)
-    {
-        dup2(term->stdout_copy, STDOUT_FILENO);
-        close(term->stdout_copy);
-        term->stdout_copy = -1;
-    }
+	if (term->stdin_copy != -1)
+	{
+		dup2(term->stdin_copy, STDIN_FILENO);
+		close(term->stdin_copy);
+		term->stdin_copy = -1;
+	}
+	if (term->stdout_copy != -1)
+	{
+		dup2(term->stdout_copy, STDOUT_FILENO);
+		close(term->stdout_copy);
+		term->stdout_copy = -1;
+	}
 }
 
-void setup_input_redirects(t_redirect_node *redir)
+void	setup_input_redirects(t_redirect_node *redir)
 {
-    t_redirect_node *node;
-    
-    if (!redir)
-        return;
-        
-    node = redir;
-    while (node)
-    {
-        if (node->type.is_heredoc)
-            handle_heredoc_redirect(node);
-        else if (node->type.is_infile)
-            handle_input_redirect(node);
-        node = node->next;
-    }
+	t_redirect_node	*node;
+	
+	if (!redir)
+		return;
+		
+	node = redir;
+	while (node)
+	{
+		if (node->type.is_heredoc)
+			handle_heredoc_redirect(node);
+		else if (node->type.is_infile)
+			handle_input_redirect(node);
+		node = node->next;
+	}
 }
 
-void setup_output_redirects(t_redirect_node *redir)
+void	setup_output_redirects(t_redirect_node *redir)
 {
-    t_redirect_node *node;
-    
-    if (!redir)
-        return;
-        
-    node = redir;
-    while (node)
-    {
-        if (node->type.is_outfile)
-            handle_output_redirect(node);
-        else if (node->type.is_append)
-            handle_append_redirect(node);
-        node = node->next;
-    }
+	t_redirect_node	*node;
+
+	if (!redir)
+		return;	
+	node = redir;
+	while (node)
+	{
+		if (node->type.is_outfile)
+			handle_output_redirect(node);
+		else if (node->type.is_append)
+			handle_append_redirect(node);
+		node = node->next;
+	}
 }

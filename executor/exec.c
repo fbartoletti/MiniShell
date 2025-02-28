@@ -12,20 +12,19 @@
 
 #include "../include/minishell.h"
 
-int is_builtin_cmd(char *cmd)
+int	is_builtin_cmd(char *cmd)
 {
-    if (!cmd)
-        return (0);
-        
-    if (ft_strcmp(cmd, "echo") == 0 ||
-        ft_strcmp(cmd, "cd") == 0 ||
-        ft_strcmp(cmd, "pwd") == 0 ||
-        ft_strcmp(cmd, "export") == 0 ||
-        ft_strcmp(cmd, "unset") == 0 ||
-        ft_strcmp(cmd, "env") == 0 ||
-        ft_strcmp(cmd, "exit") == 0)
-        return (1);
-    return (0);
+	if (!cmd)
+		return (0);
+	if (ft_strcmp(cmd, "echo") == 0 ||
+		ft_strcmp(cmd, "cd") == 0 ||
+		ft_strcmp(cmd, "pwd") == 0 ||
+		ft_strcmp(cmd, "export") == 0 ||
+		ft_strcmp(cmd, "unset") == 0 ||
+		ft_strcmp(cmd, "env") == 0 ||
+		ft_strcmp(cmd, "exit") == 0)
+		return (1);
+	return (0);
 }
 
 void	setup_pipes(int prev_pipe, int *pipe_fd)
@@ -42,34 +41,31 @@ void	setup_pipes(int prev_pipe, int *pipe_fd)
 	}
 }
 
-void run_external_command(t_terminal *term, t_command_info *cmd)
+void	run_external_command(t_terminal *term, t_command_info *cmd)
 {
-    char *cmd_path;
+	char	*cmd_path;
 
-    if (!cmd->matrix || !cmd->matrix[0])
-        exit(0);
-        
-    cmd_path = find_cmd_path(term, cmd->matrix[0]);
-    if (!cmd_path)
-    {
-        ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd->matrix[0], 2);
-        ft_putendl_fd(": comando non trovato", 2);
-        exit(127);
-    }
-    
-    if (execve(cmd_path, cmd->matrix, term->new_env) == -1)
-    {
-        ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd->matrix[0], 2);
-        ft_putstr_fd(": ", 2);
-        perror("");
-        free(cmd_path);
-        exit(126);
-    }
-    
-    free(cmd_path);
-    exit(1);
+	if (!cmd->matrix || !cmd->matrix[0])
+		exit(0);	
+	cmd_path = find_cmd_path(term, cmd->matrix[0]);
+	if (!cmd_path)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd->matrix[0], 2);
+		ft_putendl_fd(": comando non trovato", 2);
+		exit(127);
+	}
+	if (execve(cmd_path, cmd->matrix, term->new_env) == -1)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd->matrix[0], 2);
+		ft_putstr_fd(": ", 2);
+		perror("");
+		free(cmd_path);
+		exit(126);
+	}
+	free(cmd_path);
+	exit(1);
 }
 
 int	execute_builtin(t_terminal *term, t_command_info *cmd)

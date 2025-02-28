@@ -12,10 +12,10 @@
 
 #include "../include/minishell.h"
 
-t_argument *tokenize_input(char *input)
+t_argument	*tokenize_input(char *input)
 {
-	t_argument *args;
-	int i;
+	t_argument	*args;
+	int			i;
 	
 	args = NULL;
 	i = 0;
@@ -39,56 +39,53 @@ t_argument *tokenize_input(char *input)
 	return (args);
 }
 
-t_argument *create_arg_token(t_boolean is_token, char *value)
+t_argument	*create_arg_token(t_boolean is_token, char *value)
 {
-    t_argument *arg;
-    
-    arg = alloc_mem(sizeof(t_argument));
-    if (!arg)
-        return (NULL);
-    
-    arg->index = 0;
-    arg->str = value;
-    arg->token.is_token = is_token;
-    arg->token.is_pipe = FALSE;
-    arg->token.is_infile = FALSE;
-    arg->token.is_outfile = FALSE;
-    arg->token.is_append = FALSE;
-    arg->token.is_heredoc = FALSE;
-    arg->type.is_redirect = FALSE;
-    arg->type.is_infile = FALSE;
-    arg->type.is_outfile = FALSE;
-    arg->type.is_append = FALSE;
-    arg->type.is_heredoc = FALSE;
-    arg->quote.none = TRUE;
-    arg->quote.single = FALSE;
-    arg->quote.dbl = FALSE;
-    arg->chained = FALSE;
-    arg->next = NULL;
-    arg->prev = NULL;
-    
-    return (arg);
+	t_argument	*arg;
+	
+	arg = alloc_mem(sizeof(t_argument));
+	if (!arg)
+		return (NULL);
+	arg->index = 0;
+	arg->str = value;
+	arg->token.is_token = is_token;
+	arg->token.is_pipe = FALSE;
+	arg->token.is_infile = FALSE;
+	arg->token.is_outfile = FALSE;
+	arg->token.is_append = FALSE;
+	arg->token.is_heredoc = FALSE;
+	arg->type.is_redirect = FALSE;
+	arg->type.is_infile = FALSE;
+	arg->type.is_outfile = FALSE;
+	arg->type.is_append = FALSE;
+	arg->type.is_heredoc = FALSE;
+	arg->quote.none = TRUE;
+	arg->quote.single = FALSE;
+	arg->quote.dbl = FALSE;
+	arg->chained = FALSE;
+	arg->next = NULL;
+	arg->prev = NULL;
+	return (arg);
 }
 
-void add_arg_token(t_argument **args, t_argument *new)
+void	add_arg_token(t_argument **args, t_argument *new)
 {
-    t_argument *tmp;
+	t_argument	*tmp;
 
-    if (!args || !new)
-        return;
-        
-    if (!*args)
-    {
-        *args = new;
-        new->prev = new;  // Il primo nodo punta a se stesso
-    }
-    else
-    {
-        tmp = *args;
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = new;
-        new->prev = tmp;
-        (*args)->prev = new;  // Ultimo nodo connesso al primo
-    }
+	if (!args || !new)
+		return;
+	if (!*args)
+	{
+		*args = new;
+		new->prev = new;
+	}
+	else
+	{
+		tmp = *args;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+		new->prev = tmp;
+		(*args)->prev = new;
+	}
 }
