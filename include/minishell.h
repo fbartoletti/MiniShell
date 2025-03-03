@@ -6,7 +6,7 @@
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/03/03 10:24:57 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 10:28:54 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,8 +295,7 @@ char			*read_heredoc_lines(char *content, char *real_delimiter,
 char			*append_to_content(char *content, char *line);
 int				prepare_heredocs(t_terminal *term);
 void			assign_heredoc_indices(t_terminal *term);
-
-int process_heredocs_in_order(t_command_info *cmd);
+int				process_heredocs_in_order(t_command_info *cmd);
 
 /* builtin.c */
 void			execute_builtin_command(t_terminal *term, t_command_info *cmd);
