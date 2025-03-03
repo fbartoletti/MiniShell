@@ -6,7 +6,7 @@
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:48:19 by barto             #+#    #+#             */
-/*   Updated: 2025/02/28 14:20:05 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 09:34:02 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,16 +45,76 @@ t_argument	*process_quote(char *input, int *i, char quote, t_argument **args)
 
 t_argument	*process_special(char *input, int *i, t_argument **args)
 {
-	t_argument	*arg;
-	char		*value;
-	char		c;
-	t_boolean	is_pipe;
-	t_boolean	is_redir;
+	t_argument		*arg;
+	char			*value;
+	char			c;
+	int				token_len;
+	t_token_info	token_type;
 
 	c = input[*i];
-	is_pipe = (c == '|');
-	is_redir = (c == '<' || c == '>');
-	if (is_redir && input[*i + 1] == c)
+	token_len = 1;
+	if (input[*i] == '<' && input[*i + 1] == '<')
+	{
+		value = ft_strdup_safe("<<");
+		arg = create_arg_token(TRUE, value);
+		if (!arg)
+		{
+			free(value);
+			return (NULL);
+		}
+		arg->token.is_heredoc = TRUE;
+		add_arg_token(args, arg);
+
+		*i += 2;
+		while (input[*i] && is_whitespace(input[*i]))
+			(*i)++;
+		int start = *i;
+		int quote_mode = (input[*i] == '\'');
+		if (quote_mode)
+			(*i)++;
+		while (input[*i] && ((quote_mode && input[*i] != '\'') ||
+				(!quote_mode && !is_whitespace(input[*i]) && !is_special_char(input[*i]))))
+			(*i)++;
+		if (quote_mode && input[*i] == '\'')
+			(*i)++;
+		value = ft_substr(input, start, *i - start);
+		arg = create_arg_token(FALSE, value);
+		if (!arg)
+		{
+			free(value);
+			return (NULL);
+		}
+		add_arg_token(args, arg);
+		return (arg);
+	}
+	else if (input[*i] == '>' && input[*i + 1] == '>')
+	{
+		token_len = 2;
+		ft_memset(&token_type, 0, sizeof(t_token_info));
+		token_type.is_token = TRUE;
+		token_type.is_append = TRUE;
+	}
+	else if (input[*i] == '<')
+	{
+		ft_memset(&token_type, 0, sizeof(t_token_info));
+		token_type.is_token = TRUE;
+		token_type.is_infile = TRUE;
+	}
+	else if (input[*i] == '>')
+	{
+		ft_memset(&token_type, 0, sizeof(t_token_info));
+		token_type.is_token = TRUE;
+		token_type.is_outfile = TRUE;
+	}
+	else if (input[*i] == '|')
+	{
+		ft_memset(&token_type, 0, sizeof(t_token_info));
+		token_type.is_token = TRUE;
+		token_type.is_pipe = TRUE;
+	}
+	else
+		return (NULL);
+	if (token_len == 2)
 	{
 		value = alloc_mem(3);
 		value[0] = c;
@@ -75,22 +135,7 @@ t_argument	*process_special(char *input, int *i, t_argument **args)
 		free(value);
 		return (NULL);
 	}
-	if (is_pipe)
-		arg->token.is_pipe = TRUE;
-	else if (c == '<')
-	{
-		if (value[1] == '<')
-			arg->token.is_heredoc = TRUE;
-		else
-			arg->token.is_infile = TRUE;
-	}
-	else if (c == '>')
-	{
-		if (value[1] == '>')
-			arg->token.is_append = TRUE;
-		else
-			arg->token.is_outfile = TRUE;
-	}
+	arg->token = token_type;
 	add_arg_token(args, arg);
 	return (arg);
 }
@@ -102,8 +147,8 @@ t_argument	*process_word(char *input, int *i, t_argument **args)
 	int			start;
 
 	start = *i;
-	while (input[*i] && !is_whitespace(input[*i]) && 
-		   input[*i] != '\'' && input[*i] != '"' && 
+	while (input[*i] && !is_whitespace(input[*i]) &&
+		   input[*i] != '\'' && input[*i] != '"' &&
 		   !is_special_char(input[*i]))
 		(*i)++;
 	value = alloc_mem(*i - start + 1);

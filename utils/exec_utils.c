@@ -6,7 +6,7 @@
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 11:38:15 by barto             #+#    #+#             */
-/*   Updated: 2025/02/17 09:22:45 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 10:05:44 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ int	setup_redirection(t_redirect_node *redir, t_terminal *term)
 {
 	int	fd;
 
+	(void)term;
 	if (redir->type.is_infile)
 	{
 		fd = open(redir->fd_name, O_RDONLY);
@@ -62,7 +63,7 @@ int	setup_redirection(t_redirect_node *redir, t_terminal *term)
 	}
 	else if (redir->type.is_heredoc)
 	{
-		fd = handle_heredoc_input(redir, term);
+		fd = handle_heredoc_input(redir);
 		if (fd < 0)
 			return (-1);
 		dup2(fd, STDIN_FILENO);
@@ -85,27 +86,50 @@ int	setup_redirection(t_redirect_node *redir, t_terminal *term)
 	return (0);
 }
 
-int	handle_heredoc_input(t_redirect_node *redir, t_terminal *term)
+int handle_heredoc_input(t_redirect_node *redir)
 {
-	char	*content;
 	int		pipe_fd[2];
-	char	*real_delimiter;
-	int		expand_mode;
+	char	*content;
+	char	*line;
+	char	*temp;
 
-	if (pipe(pipe_fd) < 0)
+	content = NULL;
+	line = NULL;
+	temp = NULL;
+	if (pipe(pipe_fd) == -1)
+	{
+		perror("pipe");
 		return (-1);
-	content = init_heredoc_data(redir->heredoc->delimiter, term, 
-								&real_delimiter, &expand_mode);
+	}
+	content = ft_strdup("");
 	if (!content)
+	{
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
 		return (-1);
-	content = read_heredoc_lines(content, real_delimiter, expand_mode, term);
+	}
+	while (1)
+	{
+		line = readline("> ");
+		if (!line || ft_strcmp(line, redir->heredoc->delimiter) == 0)
+		{
+			free(line);
+			break;
+		}
+		temp = content;
+		content = ft_strjoin(content, line);
+		free(temp);
+		free(line);
+		temp = content;
+		content = ft_strjoin(content, "\n");
+		free(temp);
+	}
 	if (content)
 	{
 		write(pipe_fd[1], content, ft_strlen(content));
 		free(content);
 	}
 	close(pipe_fd[1]);
-	free_heredoc_data(expand_mode, real_delimiter, term);
 	return (pipe_fd[0]);
 }
 

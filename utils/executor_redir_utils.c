@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_redir_utils.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbartole <fbartole@student.42roma.it>      +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 14:16:23 by barto             #+#    #+#             */
-/*   Updated: 2025/02/17 09:23:39 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 10:15:25 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,33 @@
 
 void	handle_heredoc_redirect(t_redirect_node *node)
 {
-	int	read_file;
-
-	read_file = open(node->heredoc->temp_filename, O_RDONLY);
-	if (read_file == -1)
+	if (node->heredoc_fd >= 0)
 	{
-		ft_putstr_fd("Error on heredoc file opening.\n", 2);
-		exit(1);
+		if (dup2(node->heredoc_fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2 heredoc");
+			close(node->heredoc_fd);
+			exit(1);
+		}
+		close(node->heredoc_fd);
+		node->heredoc_fd = -1;
 	}
-	if (dup2(read_file, STDIN_FILENO) == -1)
-		perror("dup2 heredoc");
-	close(read_file);
+	else
+	{
+		int fd = handle_heredoc_input(node);
+		if (fd < 0)
+		{
+			ft_putstr_fd("minishell: errore heredoc\n", 2);
+			exit(1);
+		}
+		if (dup2(fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2 heredoc");
+			close(fd);
+			exit(1);
+		}
+		close(fd);
+	}
 }
 
 void	handle_input_redirect(t_redirect_node *node)

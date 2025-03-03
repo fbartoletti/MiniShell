@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 14:29:56 by barto             #+#    #+#             */
-/*   Updated: 2025/02/27 10:57:43 by barto            ###   ########.fr       */
+/*   Updated: 2025/03/03 08:43:46 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ int	handle_heredoc_delimiter(char *input, int *i, t_argument **args)
 	char		*value;
 	t_boolean	quote_mode;
 
+	(*i) += 2;
 	while (input[*i] && is_whitespace(input[*i]))
 		(*i)++;
 	start = *i;
@@ -71,20 +72,17 @@ int	handle_heredoc_delimiter(char *input, int *i, t_argument **args)
 	value = ft_substr(input, start, *i - start);
 	if (!value)
 		return (0);
-	
-	t_argument *new_arg = create_arg_token(FALSE, value);
-	if (!new_arg)
+	t_argument *arg = create_arg_token(FALSE, value);
+	if (!arg)
 	{
 		free(value);
 		return (0);
 	}
-	
 	if (quote_mode)
 	{
-		new_arg->quote.none = FALSE;
-		new_arg->quote.single = TRUE;
+		arg->quote.none = FALSE;
+		arg->quote.single = TRUE;
 	}
-	
-	add_arg_token(args, new_arg);
+	add_arg_token(args, arg);
 	return (1);
 }

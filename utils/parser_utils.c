@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/04 16:52:52 by barto             #+#    #+#             */
-/*   Updated: 2025/01/04 16:54:57 by barto            ###   ########.fr       */
+/*   Updated: 2025/03/03 10:10:14 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ t_redirect_node	*create_redirect(t_redirect type, char *file)
 		return (NULL);
 	redir->type = type;
 	redir->fd_name = ft_strdup_safe(file);
+	redir->heredoc_fd = -1;
 	if (!redir->fd_name)
 	{
 		free(redir);
@@ -76,6 +77,8 @@ char	*generate_heredoc_filename(int index)
 	char	*filename;
 
 	index_str = ft_itoa(index);
+	if (!index_str)
+		return (NULL);
 	temp = ft_strjoin(".here_doc_", index_str);
 	free(index_str);
 	if (!temp)
@@ -85,13 +88,14 @@ char	*generate_heredoc_filename(int index)
 	return (filename);
 }
 
-int prepare_heredocs(t_terminal *term)
+int	prepare_heredocs(t_terminal *term)
 {
 	t_command_info	*cmd;
 	t_redirect_node	*redir;
-	static int	heredoc_index;
+	int				index;
+	int				fd;
 
-	heredoc_index = 0;
+	index = 0;
 	cmd = term->commands;
 	while (cmd)
 	{
@@ -100,18 +104,35 @@ int prepare_heredocs(t_terminal *term)
 		{
 			if (redir->type.is_heredoc)
 			{
-				heredoc_index++;
-				redir->heredoc->index = heredoc_index;
-				redir->heredoc->temp_filename = generate_heredoc_filename(heredoc_index);
-				
-				if (!redir->heredoc->temp_filename)
-					return (0);
-				// Qui potrebbe essere chiamata una funzione per leggere l'input dell'heredoc
-				// handle_heredoc_input(redir, term);
+				redir->heredoc->index = index;
+				index++;
 			}
 			redir = redir->next;
 		}
 		cmd = cmd->next;
+	}
+	index = 0;
+	cmd = term->commands;
+	while (cmd)
+	{
+		redir = cmd->redirects;
+		while (redir)
+		{
+			if (redir->type.is_heredoc && redir->heredoc->index == index)
+			{
+				fd = handle_heredoc_input(redir);
+				if (fd < 0)
+					return (0);
+				redir->heredoc_fd = fd;
+				index++;
+				cmd = term->commands;
+				redir = NULL;
+			}
+			if (redir)
+				redir = redir->next;
+		}
+		if (cmd)
+			cmd = cmd->next;
 	}
 	return (1);
 }

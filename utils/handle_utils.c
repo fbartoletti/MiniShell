@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 11:14:23 by barto             #+#    #+#             */
-/*   Updated: 2025/02/27 10:24:15 by barto            ###   ########.fr       */
+/*   Updated: 2025/03/03 09:22:16 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,19 +61,21 @@ char	*process_heredoc_queue(t_terminal *term, t_redirect_node *queue)
 {
 	t_redirect_node	*current;
 	char			*final_content;
+	int				fd;
 
+	(void)term;
 	current = queue;
 	final_content = NULL;
 	while (current)
 	{
 		current->heredoc->temp_filename = generate_heredoc_filename(
 				current->heredoc->index);
-		if (!handle_heredoc_input(current, term))
-		{
+		fd = handle_heredoc_input(current);
+		if (fd < 0)
 			return (NULL);
-		}
-		if (!final_content)
-			final_content = ft_strdup_safe(current->fd_name);
+		current->heredoc_fd = fd;
+		if (!final_content && current->fd_name)
+			final_content = ft_strdup_safe(current->fd_name);	
 		current = current->next;
 	}
 	return (final_content);

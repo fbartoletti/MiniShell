@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/02/25 15:57:28 by barto            ###   ########.fr       */
+/*   Updated: 2025/03/03 10:24:57 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ typedef struct s_redirect_node
 {
 	char					*fd_name;
 	t_heredoc_data			*heredoc;
+	int						heredoc_fd;
 	t_redirect				type;
 	struct s_redirect_node  *next;
 	struct s_redirect_node	*prev;
@@ -247,10 +248,6 @@ int				expand_command_args(t_terminal *term, t_command_info *cmd);
 int				handle_heredoc_delimiter(char *input, int *i, t_argument **args);
 int				create_special_token(t_argument **args, char *value, t_token_info type);
 t_token_info	get_token_type(char *input, int i, int *len);
-void			free_heredoc_list(t_redirect_node *list);
-char			*process_heredoc_contents(t_terminal *term, t_redirect_node *redirects);
-void			add_heredoc_node(t_redirect_node **list, t_redirect_node *new);
-t_redirect_node	*create_heredoc_node(char *delimiter);
 void			handle_redirections(t_command_info *cmd);
 int				execute_builtin(t_terminal *term, t_command_info *cmd);
 void			setup_pipes(int prev_pipe, int *pipe_fd);
@@ -287,7 +284,7 @@ void			free_string_array(char **array);
 void			handle_cmd_error(char *cmd);
 
 /* heredoc.c */
-int				handle_heredoc_input(t_redirect_node *redir, t_terminal *term);
+int				handle_heredoc_input(t_redirect_node *redir);
 char			*init_heredoc_data(char *delimiter, t_terminal *term,
 					char **real_delimiter, int *expand_mode);
 char			*process_heredoc_content(char *line, t_terminal *term, int expand_mode);
@@ -296,6 +293,10 @@ void			free_heredoc_data(int expand_mode, char *real_delimiter,
 char			*read_heredoc_lines(char *content, char *real_delimiter,
 					int expand_mode, t_terminal *term);
 char			*append_to_content(char *content, char *line);
+int				prepare_heredocs(t_terminal *term);
+void			assign_heredoc_indices(t_terminal *term);
+
+int process_heredocs_in_order(t_command_info *cmd);
 
 /* builtin.c */
 void			execute_builtin_command(t_terminal *term, t_command_info *cmd);
@@ -332,7 +333,6 @@ void			cleanup_resources(void);
 		/* TO DO LIST */
 // implementa unset che ti leva le variabili ambiente nell'expander
 // se faccio export vedere se la variabile e gia presente
-// ri implementare heredoc e mettere apposto quelli multipli
 // sitemare errore 2 token vicini (> >, >> >> ecc)
 
 	// sistemare del tutto la norma: 
@@ -348,9 +348,11 @@ void			cleanup_resources(void);
 // read_heredoc_content
 // setup_redirection
 // find_cmd_path
-// process_heredoc_contents
 // process_arguments_to_commands
 // create_redirect
 // handle_heredoc_delimiter
 // update_env_var
-// 
+// handle_heredoc_input
+// prepare_heredocs
+// handle_heredoc_redirect
+// process_heredocs_in_order

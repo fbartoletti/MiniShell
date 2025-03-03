@@ -29,7 +29,6 @@ SRCS = main/main.c \
 	utils/expand_utils.c \
 	utils/token_utils.c \
 	utils/heredoc_utils.c \
-	utils/heredoc_util.c \
 	utils/executor_redir_utils.c \
 	utils/utils_free.c \
 	utils/utils_str.c \
