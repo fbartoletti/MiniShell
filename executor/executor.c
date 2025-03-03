@@ -6,7 +6,7 @@
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:31:12 by barto             #+#    #+#             */
-/*   Updated: 2025/03/03 10:24:42 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 14:22:15 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,16 +52,15 @@ void	run_commands(t_terminal *term)
 	restore_io(term);
 }
 
-int	process_heredocs_in_order(t_command_info *cmd)
+int	collect_heredocs_input(t_command_info *cmd)
 {
 	t_redirect_node	*redir;
 	t_redirect_node	**heredocs;
-	int	count;
-	int	i;
-	int	result;
+	int				count;
+	int				i;
 
+	heredocs = NULL;
 	count = 0;
-	result = 1;
 	redir = cmd->redirects;
 	while (redir)
 	{
@@ -71,7 +70,7 @@ int	process_heredocs_in_order(t_command_info *cmd)
 	}
 	if (count == 0)
 		return (1);
-	heredocs = (t_redirect_node **)alloc_mem(sizeof(t_redirect_node *) * count);
+	heredocs = (t_redirect_node **)malloc(sizeof(t_redirect_node *) * count);
 	if (!heredocs)
 		return (0);
 	i = 0;
@@ -88,17 +87,41 @@ int	process_heredocs_in_order(t_command_info *cmd)
 	i = 0;
 	while (i < count)
 	{
-		int fd = handle_heredoc_input(heredocs[i]);
-		if (fd < 0)
+		int pipe_fd[2];
+		if (pipe(pipe_fd) < 0)
 		{
-			result = 0;
-			break;
+			ft_putstr_fd("minishell: errore pipe heredoc\n", 2);
+			free(heredocs);
+			return (0);
 		}
-		heredocs[i]->heredoc_fd = fd;
+		char *content = ft_strdup_safe("");
+		char *line;
+		ft_putstr_fd("> ", 2);
+		while (1)
+		{
+			line = readline("");
+			if (!line || ft_strcmp(line, heredocs[i]->heredoc->delimiter) == 0)
+			{
+				free(line);
+				break;
+			}
+			char *temp = content;
+			content = ft_strjoin(content, line);
+			free(temp);
+			free(line);
+			temp = content;
+			content = ft_strjoin(content, "\n");
+			free(temp);
+			ft_putstr_fd("> ", 2);
+		}
+		write(pipe_fd[1], content, ft_strlen(content));
+		free(content);
+		close(pipe_fd[1]);
+		heredocs[i]->heredoc_fd = pipe_fd[0];
 		i++;
 	}
 	free(heredocs);
-	return (result);
+	return (1);
 }
 
 void	execute_pipeline(t_terminal *term)
@@ -109,12 +132,13 @@ void	execute_pipeline(t_terminal *term)
 	pid_t			pid;
 	int				status;
 
+	prev_fd = -1;
 	cmd = term->commands;
 	while (cmd)
 	{
-		if (!process_heredocs_in_order(cmd))
+		if (!collect_heredocs_input(cmd))
 		{
-			ft_putstr_fd("minishell: errore heredoc\n", 2);
+			ft_putstr_fd("minishell: errore raccolta heredoc\n", 2);
 			return;
 		}
 		if (cmd->next && pipe(pipe_fd) < 0)
@@ -143,10 +167,15 @@ void	execute_pipeline(t_terminal *term)
 			signal(SIGQUIT, SIG_DFL);
 			if (prev_fd != -1)
 			{
+				if (dup2(prev_fd, STDIN_FILENO) == -1)
+					perror("dup2 input");
+				close(prev_fd);
+			}
 			if (cmd->next)
 			{
 				close(pipe_fd[0]);
-				dup2(pipe_fd[1], STDOUT_FILENO);
+				if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+					perror("dup2 output");
 				close(pipe_fd[1]);
 			}
 			setup_input_redirects(cmd->redirects);
@@ -159,12 +188,9 @@ void	execute_pipeline(t_terminal *term)
 					exit(g_last_status);
 				}
 				else
-				{
 					run_external_command(term, cmd);
-				}
 			}
 			exit(0);
-			}
 		}
 		else
 		{
@@ -178,6 +204,8 @@ void	execute_pipeline(t_terminal *term)
 			cmd = cmd->next;
 		}
 	}
+	if (prev_fd != -1)
+		close(prev_fd);
 	while (wait(&status) > 0)
 	{
 		if (WIFEXITED(status))

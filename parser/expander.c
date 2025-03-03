@@ -6,7 +6,7 @@
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:52:55 by barto             #+#    #+#             */
-/*   Updated: 2025/02/28 14:19:22 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 13:59:41 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,21 @@ char	*extract_var_name(char *str, int *i)
 
 	start = *i;
 	len = 0;
-	while (str[start + len] && (ft_isalnum(str[start + len]) || 
-		str[start + len] == '_'))
-		len++;
+	if (str[start] == '{')
+	{
+		start++;
+		(*i)++;
+		while (str[start + len] && str[start + len] != '}')
+			len++;
+		if (str[start + len] == '}')
+			(*i)++;
+	}
+	else
+	{
+		while (str[start + len] && (ft_isalnum(str[start + len]) || 
+			   str[start + len] == '_'))
+			len++;
+	}
 	if (len == 0)
 		return (NULL);
 	*i += len;

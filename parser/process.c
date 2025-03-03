@@ -6,7 +6,7 @@
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:48:19 by barto             #+#    #+#             */
-/*   Updated: 2025/03/03 09:34:02 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/03 13:58:08 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,17 @@ t_argument	*process_quote(char *input, int *i, char quote, t_argument **args)
 		j++;
 	if (!input[j])
 		return (NULL);
-	value = ft_strdup_safe(input + start);
-	value[j - start] = '\0';
+	value = ft_substr(input, start, j - start);
+	if (!value)
+		return (NULL);
+	if (quote == '\'')
+	{
+		char *temp = value;
+		value = ft_strjoin("\1", value);
+		free(temp);
+		if (!value)
+			return (NULL);
+	}
 	arg = create_arg_token(FALSE, value);
 	if (!arg)
 	{
@@ -37,7 +46,7 @@ t_argument	*process_quote(char *input, int *i, char quote, t_argument **args)
 	if (quote == '\'')
 		arg->quote.single = TRUE;
 	else
-		arg->quote.dbl = TRUE;
+		arg->quote.dbl = TRUE; 
 	*i = j + 1;
 	add_arg_token(args, arg);
 	return (arg);

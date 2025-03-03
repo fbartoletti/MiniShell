@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/30 12:24:58 by barto             #+#    #+#             */
-/*   Updated: 2025/02/10 11:46:23 by barto            ###   ########.fr       */
+/*   Updated: 2025/03/03 13:36:16 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@ char	*expand_variable(t_terminal *term, char *str, int *i, char *result)
 		(*i)++;
 	}
 	else
-		expanded = get_env_var_value(term->new_env, extract_var_name(str, i));
+		expanded = get_env_var_value(term->new_env, extract_var_name(str, i)); 
 	if (!expanded)
-		return (result);
+		return (result); 
 	new_result = concat_strings(result, expanded);
 	free(result);
 	free(expanded);
@@ -69,7 +69,7 @@ int expand_redirect_paths(t_terminal *term, t_command_info *cmd)
 	return (0);
 }
 
-void process_expansions(t_terminal *term)
+void	process_expansions(t_terminal *term)
 {
 	t_command_info	*cmd;
 

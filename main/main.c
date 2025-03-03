@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: barto <barto@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:22:30 by barto             #+#    #+#             */
-/*   Updated: 2025/02/25 15:56:49 by barto            ###   ########.fr       */
+/*   Updated: 2025/03/03 13:35:38 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,12 @@ static void process_line(t_terminal *term, char *line)
 {
 	if (!process_input_line(term, line))
 		return;
+	t_command_info *cmd = term->commands;
+	while (cmd)
+	{
+		expand_cmd_args(term, cmd);
+		cmd = cmd->next;
+	}
 	if (term->error)
 	{
 		cleanup_memory(term);
