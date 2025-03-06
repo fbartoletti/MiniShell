@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils_string.c                                     :+:      :+:    :+:   */
+/*   utils_env.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/27 12:21:27 by barto             #+#    #+#             */
-/*   Updated: 2025/02/28 14:16:14 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/06 09:51:54 by ubuntu           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ int	find_env_var_index(char **env, char *name)
 {
 	int		i;
 	size_t	len;
+	char	*equal_sign;
 
 	if (!env || !name)
 		return (-1);
@@ -46,7 +47,10 @@ int	find_env_var_index(char **env, char *name)
 	len = ft_strlen(name);
 	while (env[i])
 	{
-		if (ft_strncmp(env[i], name, len) == 0 && env[i][len] == '=')
+		equal_sign = ft_strchr(env[i], '=');
+		if (equal_sign && ft_strncmp(env[i], name, len) == 0 && env[i][len] == '=')
+			return (i);
+		if (!equal_sign && ft_strcmp(env[i], name) == 0)
 			return (i);
 		i++;
 	}
