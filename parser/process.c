@@ -73,10 +73,14 @@ t_argument	*process_special(char *input, int *i, t_argument **args)
 		}
 		arg->token.is_heredoc = TRUE;
 		add_arg_token(args, arg);
-
 		*i += 2;
 		while (input[*i] && is_whitespace(input[*i]))
 			(*i)++;
+		if (!input[*i] || input[*i] == '\0')
+		{
+			ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+			return (NULL);
+		}
 		int start = *i;
 		int quote_mode = (input[*i] == '\'');
 		if (quote_mode)

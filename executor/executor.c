@@ -23,8 +23,8 @@ void	handle_single_builtin(t_terminal *term)
 }
 
 void	run_commands(t_terminal *term)
-{ 
-	if (!term->commands)
+{
+	if (!term->commands || term->error)
 		return;
 	term->stdin_copy = dup(STDIN_FILENO);
 	term->stdout_copy = dup(STDOUT_FILENO);

@@ -34,7 +34,10 @@ void	add_command_to_shell(t_terminal *term, t_command_info *cmd)
 static int	validate_redirections(t_argument *arg)
 {
 	if (!arg->next || !arg->next->str)
-		return (display_error(ERR_REDIR), 0);
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+		return (0);
+	}
 	return (1);
 }
 
