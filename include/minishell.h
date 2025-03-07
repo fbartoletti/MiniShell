@@ -352,4 +352,3 @@ void			cleanup_resources(void);
 // handle_heredoc_input
 // prepare_heredocs
 // handle_heredoc_redirect
-// 
