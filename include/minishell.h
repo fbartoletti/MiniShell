@@ -330,9 +330,7 @@ void			cleanup_resources(void);
 #endif
 
 		/* TO DO LIST */
-// se faccio export vedere se la variabile e gia presente
 
-	// sistemare del tutto la norma: 
 // run_commands
 // execute_pipeline
 // main
