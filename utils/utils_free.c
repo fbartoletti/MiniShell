@@ -70,14 +70,9 @@ void	free_terminal(t_terminal *term)
 		term->new_env = NULL;
 	}
 	if (term->line)
-	{
-		free(term->line);
 		term->line = NULL;
-	}
 	if (term->env)
-	{
 		free_env_list(&term->env);
-	}
 }
 
 void	exit_with_error(char *msg)
