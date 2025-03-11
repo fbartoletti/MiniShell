@@ -51,21 +51,21 @@ void	case_2(t_token_info *token_type, int *token_len)
 
 void	case_3(t_token_info *token_type)
 {
-	ft_memset(&token_type, 0, sizeof(t_token_info));
+	ft_memset(token_type, 0, sizeof(t_token_info));
 	(*token_type).is_token = TRUE;
 	(*token_type).is_infile = TRUE;
 }
 
 void	case_4(t_token_info *token_type)
 {
-	ft_memset(&token_type, 0, sizeof(t_token_info));
+	ft_memset(token_type, 0, sizeof(t_token_info));
 	(*token_type).is_token = TRUE;
 	(*token_type).is_outfile = TRUE;
 }
 
 void	case_5(t_token_info *token_type)
 {
-	ft_memset(&token_type, 0, sizeof(t_token_info));
+	ft_memset(token_type, 0, sizeof(t_token_info));
 	(*token_type).is_token = TRUE;
 	(*token_type).is_pipe = TRUE;
 }
