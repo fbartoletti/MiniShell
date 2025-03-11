@@ -34,41 +34,6 @@ int	check_basic_syntax(char *line)
 	return (pipe_start && !is_whitespace(line[i - 1]));
 }
 
-int	process_arguments_to_commands(t_terminal *term)
-{
-	t_argument		*current;
-	t_command_info	*cmd;
-	int				ret;
-
-	current = term->args;
-	cmd = create_cmd();
-	if (!cmd)
-		return (0);
-	while (current)
-	{
-		ret = handle_token(term, current, cmd);
-		if (ret == 0)
-		{
-			free_cmd_content(cmd);
-			free(cmd);
-			return (0);
-		}
-		if (ret == 2 && current->next)
-			current = current->next->next;
-		else
-			current = current->next;
-	}
-	if (cmd->matrix || cmd->redirects)
-		add_cmd(&term->commands, cmd);
-	else
-	{
-		free_cmd_content(cmd);
-		free(cmd);
-	}
-	process_expansions(term);
-	return (1);
-}
-
 void	cleanup_memory(t_terminal *term)
 {
 	if (term->args)

@@ -37,7 +37,7 @@ static int	validate_redirections(t_argument *arg)
 {
 	if (!arg->next || !arg->next->str)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+		ft_putstr_fd(ERR_TOK, 2);
 		return (0);
 	}
 	return (1);

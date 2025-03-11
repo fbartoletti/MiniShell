@@ -26,9 +26,9 @@ char	*expand_variable(t_terminal *term, char *str, int *i, char *result)
 		(*i)++;
 	}
 	else
-		expanded = get_env_var_value(term->new_env, extract_var_name(str, i)); 
+		expanded = get_env_var_value(term->new_env, extract_var_name(str, i));
 	if (!expanded)
-		return (result); 
+		return (result);
 	new_result = concat_strings(result, expanded);
 	free(result);
 	free(expanded);
@@ -47,7 +47,7 @@ char	*add_char(char *str, char c)
 	return (new_result);
 }
 
-int expand_redirect_paths(t_terminal *term, t_command_info *cmd)
+int	expand_redirect_paths(t_terminal *term, t_command_info *cmd)
 {
 	t_redirect_node	*redir;
 	char			*expanded;

@@ -62,12 +62,26 @@ int	handle_export_error(char *name, char *value)
 	return (1);
 }
 
+void	remove_env_var(t_terminal *term, t_environment *current)
+{
+	if (current == term->env)
+		term->env = current->next;
+	if (current->prev)
+		current->prev->next = current->next;
+	if (current->next)
+		current->next->prev = current->prev;
+	free(current->var);
+	free(current->name);
+	free(current->value);
+	free(current);
+}
+
 void	update_env_list_after_unset(t_terminal *term, char **args)
 {
 	t_environment	*current;
 	t_environment	*next;
 	int				i;
-	
+
 	i = 1;
 	while (args[i])
 	{
@@ -77,23 +91,8 @@ void	update_env_list_after_unset(t_terminal *term, char **args)
 			next = current->next;
 			if (ft_strcmp(current->name, args[i]) == 0)
 			{
-				if (current->prev != current)
-				{
-					if (current == term->env)
-						term->env = current->next;
-					if (current->prev)
-						current->prev->next = current->next;
-					if (current->next)
-						current->next->prev = current->prev;
-				}
-				else
-					term->env = NULL;
-				free(current->var);
-				free(current->name);
-				if (current->value)
-					free(current->value);
-				free(current);
-				break;
+				remove_env_var(term, current);
+				break ;
 			}
 			current = next;
 		}

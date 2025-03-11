@@ -48,7 +48,8 @@ int	find_env_var_index(char **env, char *name)
 	while (env[i])
 	{
 		equal_sign = ft_strchr(env[i], '=');
-		if (equal_sign && ft_strncmp(env[i], name, len) == 0 && env[i][len] == '=')
+		if (equal_sign && ft_strncmp(env[i], name, len) == 0
+			&& env[i][len] == '=')
 			return (i);
 		if (!equal_sign && ft_strcmp(env[i], name) == 0)
 			return (i);
@@ -80,14 +81,13 @@ void	update_env_var(t_terminal *term, const char *name, const char *value)
 	char	*temp;
 
 	if (!term || !name || !value || !term->new_env)
-		return;
+		return ;
 	index = find_env_var_index(term->new_env, (char *)name);
 	if (index >= 0)
 	{
 		temp = ft_strjoin(name, "=");
 		new_var = ft_strjoin(temp, value);
 		free(temp);
-		
 		free(term->new_env[index]);
 		term->new_env[index] = new_var;
 	}
@@ -96,7 +96,6 @@ void	update_env_var(t_terminal *term, const char *name, const char *value)
 		temp = ft_strjoin(name, "=");
 		new_var = ft_strjoin(temp, value);
 		free(temp);
-		
 		add_new_env_var(term, new_var);
 	}
 }

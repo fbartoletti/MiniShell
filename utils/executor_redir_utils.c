@@ -12,36 +12,31 @@
 
 #include "../include/minishell.h"
 
+int	get_heredoc_fd(t_redirect_node *node)
+{
+	if (node->heredoc_fd >= 0)
+		return (node->heredoc_fd);
+	return (handle_heredoc_input(node));
+}
+
 void	handle_heredoc_redirect(t_redirect_node *node)
 {
 	int	fd;
 
-	if (node->heredoc_fd >= 0)
+	fd = get_heredoc_fd(node);
+	if (fd < 0)
 	{
-		if (dup2(node->heredoc_fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2 heredoc");
-			exit(1);
-		}
-		close(node->heredoc_fd);
-		node->heredoc_fd = -1;
+		ft_putstr_fd("minishell: errore heredoc\n", 2);
+		exit(1);
 	}
-	else
+	if (dup2(fd, STDIN_FILENO) == -1)
 	{
-		fd = handle_heredoc_input(node);
-		if (fd < 0)
-		{
-			ft_putstr_fd("minishell: errore heredoc\n", 2);
-			exit(1);
-		}
-		if (dup2(fd, STDIN_FILENO) == -1)
-		{
-			perror("dup2 heredoc");
-			close(fd);
-			exit(1);
-		}
+		perror("dup2 heredoc");
 		close(fd);
+		exit(1);
 	}
+	close(fd);
+	node->heredoc_fd = -1;
 }
 
 void	handle_input_redirect(t_redirect_node *node)
@@ -69,7 +64,7 @@ void	handle_input_redirect(t_redirect_node *node)
 void	handle_output_redirect(t_redirect_node *node)
 {
 	int	fd;
-	
+
 	fd = open(node->fd_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
 	{

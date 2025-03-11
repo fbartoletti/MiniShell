@@ -31,7 +31,7 @@ t_argument	*case_1(int *i, char *input, t_argument **args)
 		(*i)++;
 	if (!input[*i] || input[*i] == '\0')
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+		ft_putstr_fd(ERR_TOK, 2);
 		return (NULL);
 	}
 	arg = case_1_helper(value, i, input);

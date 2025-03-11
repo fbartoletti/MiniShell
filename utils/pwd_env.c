@@ -12,14 +12,18 @@
 
 #include "../include/minishell.h"
 
-void	export_env_var(t_terminal *term, const char *var_name, const char *value)
+void	export_env_var(t_terminal *term, const char *var_name,
+			const char *value)
 {
 	char	*env_var;
-	
+	char	*args[3];
+
 	env_var = ft_strjoin(var_name, value);
 	if (env_var)
 	{
-		char *args[3] = {"export", env_var, NULL};
+		args[0] = "export";
+		args[1] = env_var;
+		args[2] = NULL;
 		cmd_export(term, args);
 		free(env_var);
 	}
@@ -28,7 +32,7 @@ void	export_env_var(t_terminal *term, const char *var_name, const char *value)
 void	update_pwd_env(t_terminal *term, const char *old_pwd)
 {
 	char	*pwd;
-	
+
 	pwd = getcwd(NULL, 0);
 	if (pwd)
 	{

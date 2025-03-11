@@ -51,6 +51,25 @@ int	create_special_token(t_argument **args, char *value, t_token_info type)
 	return (1);
 }
 
+int	delimiter_norm(char *value, t_boolean quote_mode, t_argument **args)
+{
+	t_argument	*arg;
+
+	arg = create_arg_token(FALSE, value);
+	if (!arg)
+	{
+		free(value);
+		return (0);
+	}
+	if (quote_mode)
+	{
+		arg->quote.none = FALSE;
+		arg->quote.single = TRUE;
+	}
+	add_arg_token(args, arg);
+	return (1);
+}
+
 int	handle_heredoc_delimiter(char *input, int *i, t_argument **args)
 {
 	int			start;
@@ -64,25 +83,13 @@ int	handle_heredoc_delimiter(char *input, int *i, t_argument **args)
 	quote_mode = (input[*i] == '\'');
 	if (quote_mode)
 		(*i)++;
-	while (input[*i] && ((quote_mode && input[*i] != '\'') || 
-		(!quote_mode && !is_whitespace(input[*i]))))
+	while (input[*i] && ((quote_mode && input[*i] != '\'')
+			|| (!quote_mode && !is_whitespace(input[*i]))))
 		(*i)++;
 	if (quote_mode && input[*i] == '\'')
 		(*i)++;
 	value = ft_substr(input, start, *i - start);
 	if (!value)
 		return (0);
-	t_argument *arg = create_arg_token(FALSE, value);
-	if (!arg)
-	{
-		free(value);
-		return (0);
-	}
-	if (quote_mode)
-	{
-		arg->quote.none = FALSE;
-		arg->quote.single = TRUE;
-	}
-	add_arg_token(args, arg);
-	return (1);
+	return (delimiter_norm(value, quote_mode, args));
 }

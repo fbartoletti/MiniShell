@@ -50,7 +50,6 @@ char	*concat_strings(const char *s1, const char *s2)
 	result = ft_strjoin(s1, s2);
 	if (!result)
 		exit_with_error(ERR_MALLOC);
-	
 	return (result);
 }
 

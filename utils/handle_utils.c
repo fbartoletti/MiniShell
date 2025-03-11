@@ -75,7 +75,7 @@ char	*process_heredoc_queue(t_terminal *term, t_redirect_node *queue)
 			return (NULL);
 		current->heredoc_fd = fd;
 		if (!final_content && current->fd_name)
-			final_content = ft_strdup_safe(current->fd_name);	
+			final_content = ft_strdup_safe(current->fd_name);
 		current = current->next;
 	}
 	return (final_content);

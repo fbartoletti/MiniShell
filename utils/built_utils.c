@@ -41,7 +41,8 @@ int	ft_export_print_env(t_terminal *term)
 	return (0);
 }
 
-int	ft_export_create_or_update_env(t_terminal *term, char *name, char *env_string)
+int	ft_export_create_or_update_env(t_terminal *term,
+char *name, char *env_string)
 {
 	int	env_index;
 
@@ -98,5 +99,8 @@ int	extract_name_value(char *arg, char **name, char **value)
 		*name = ft_strdup(arg);
 		*value = ft_strdup("");
 	}
-	return (*name && *value) ? 0 : 1;
+	if (*name && *value)
+		return (0);
+	else
+		return (1);
 }

@@ -17,8 +17,7 @@ char	*find_cmd_path(t_terminal *term, char *cmd)
 	char	**paths;
 	char	*path_env;
 	char	*full_path;
-	int		i;
-	
+
 	if (!cmd || !*cmd)
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
@@ -30,72 +29,19 @@ char	*find_cmd_path(t_terminal *term, char *cmd)
 	free(path_env);
 	if (!paths)
 		return (NULL);
-	i = 0;
-	while (paths[i])
-	{
-		char *temp = ft_strjoin(paths[i], "/");
-		full_path = ft_strjoin(temp, cmd);
-		free(temp);
-		
-		if (access(full_path, X_OK) == 0)
-		{
-			free_string_array(paths);
-			return (full_path);
-		}
-		free(full_path);
-		i++;
-	}
+	full_path = create_path(&paths, cmd);
+	if (full_path)
+		return (full_path);
 	free_string_array(paths);
 	return (NULL);
 }
 
-int	setup_redirection(t_redirect_node *redir, t_terminal *term)
-{
-	int	fd;
-
-	(void)term;
-	if (redir->type.is_infile)
-	{
-		fd = open(redir->fd_name, O_RDONLY);
-		if (fd < 0)
-			return (display_error("No such file or directory"), -1);
-		dup2(fd, STDIN_FILENO);
-	}
-	else if (redir->type.is_heredoc)
-	{
-		fd = handle_heredoc_input(redir);
-		if (fd < 0)
-			return (-1);
-		dup2(fd, STDIN_FILENO);
-	}
-	else if (redir->type.is_outfile)
-	{
-		fd = open(redir->fd_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (fd < 0)
-			return (display_error("Error opening output file"), -1);
-		dup2(fd, STDOUT_FILENO);
-	}
-	else if (redir->type.is_append)
-	{
-		fd = open(redir->fd_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (fd < 0)
-			return (display_error("Error opening output file"), -1);
-		dup2(fd, STDOUT_FILENO);
-	}
-	close(fd);
-	return (0);
-}
-
-int handle_heredoc_input(t_redirect_node *redir)
+int	handle_heredoc_input(t_redirect_node *redir)
 {
 	int		pipe_fd[2];
 	char	*content;
-	char	*line;
-	char	*temp;
 
 	content = NULL;
-	line = NULL;
-	temp = NULL;
 	if (pipe(pipe_fd) == -1)
 	{
 		perror("pipe");
@@ -108,22 +54,7 @@ int handle_heredoc_input(t_redirect_node *redir)
 		close(pipe_fd[1]);
 		return (-1);
 	}
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || ft_strcmp(line, redir->heredoc->delimiter) == 0)
-		{
-			free(line);
-			break;
-		}
-		temp = content;
-		content = ft_strjoin(content, line);
-		free(temp);
-		free(line);
-		temp = content;
-		content = ft_strjoin(content, "\n");
-		free(temp);
-	}
+	heredoc_rl(&content, redir);
 	if (content)
 	{
 		write(pipe_fd[1], content, ft_strlen(content));
@@ -137,7 +68,7 @@ char	*get_env_from_array(char **env, const char *name)
 {
 	int	name_len;
 	int	i;
-	
+
 	name_len = ft_strlen(name);
 	i = 0;
 	if (!name)

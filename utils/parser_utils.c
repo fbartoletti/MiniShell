@@ -12,6 +12,28 @@
 
 #include "../include/minishell.h"
 
+int	setup_heredoc(t_redirect type, t_redirect_node **redir, char *file)
+{
+	if (type.is_heredoc)
+	{
+		(*redir)->heredoc = alloc_mem(sizeof(t_heredoc_data));
+		if (!(*redir)->heredoc)
+		{
+			free((*redir)->fd_name);
+			free((*redir));
+			return (1);
+		}
+		(*redir)->heredoc->delimiter = ft_strdup_safe(file);
+		(*redir)->heredoc->temp_filename = NULL;
+		if ((*redir)->fd_name[0] == '\'')
+			(*redir)->heredoc->expand = FALSE;
+		else
+			(*redir)->heredoc->expand = TRUE;
+		(*redir)->heredoc->index = 0;
+	}
+	return (0);
+}
+
 t_redirect_node	*create_redirect(t_redirect type, char *file)
 {
 	t_redirect_node	*redir;
@@ -30,23 +52,8 @@ t_redirect_node	*create_redirect(t_redirect type, char *file)
 	redir->heredoc = NULL;
 	redir->next = NULL;
 	redir->prev = NULL;
-	if (type.is_heredoc)
-	{
-		redir->heredoc = alloc_mem(sizeof(t_heredoc_data));
-		if (!redir->heredoc)
-		{
-			free(redir->fd_name);
-			free(redir);
-			return (NULL);
-		}
-		redir->heredoc->delimiter = ft_strdup_safe(file);
-		redir->heredoc->temp_filename = NULL;
-		if (redir->fd_name[0] == '\'')
-			redir->heredoc->expand = FALSE;
-		else
-			redir->heredoc->expand = TRUE;
-		redir->heredoc->index = 0;
-	}
+	if (setup_heredoc(type, &redir, file) != 0)
+		return (NULL);
 	return (redir);
 }
 
@@ -86,53 +93,4 @@ char	*generate_heredoc_filename(int index)
 	filename = ft_strjoin(temp, ".tmp");
 	free(temp);
 	return (filename);
-}
-
-int	prepare_heredocs(t_terminal *term)
-{
-	t_command_info	*cmd;
-	t_redirect_node	*redir;
-	int				index;
-	int				fd;
-
-	index = 0;
-	cmd = term->commands;
-	while (cmd)
-	{
-		redir = cmd->redirects;
-		while (redir)
-		{
-			if (redir->type.is_heredoc)
-			{
-				redir->heredoc->index = index;
-				index++;
-			}
-			redir = redir->next;
-		}
-		cmd = cmd->next;
-	}
-	index = 0;
-	cmd = term->commands;
-	while (cmd)
-	{
-		redir = cmd->redirects;
-		while (redir)
-		{
-			if (redir->type.is_heredoc && redir->heredoc->index == index)
-			{
-				fd = handle_heredoc_input(redir);
-				if (fd < 0)
-					return (0);
-				redir->heredoc_fd = fd;
-				index++;
-				cmd = term->commands;
-				redir = NULL;
-			}
-			if (redir)
-				redir = redir->next;
-		}
-		if (cmd)
-			cmd = cmd->next;
-	}
-	return (1);
 }

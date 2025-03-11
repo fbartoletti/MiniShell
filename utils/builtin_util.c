@@ -98,7 +98,7 @@ void	execute_builtin_command(t_terminal *term, t_command_info *cmd)
 void	identify_builtin(t_command_info *cmd)
 {
 	if (!cmd || !cmd->matrix || !cmd->matrix[0])
-		return;
+		return ;
 	cmd->builtin.is_builtin = is_builtin_cmd(cmd->matrix[0]);
 	cmd->builtin.is_echo = (ft_strcmp(cmd->matrix[0], "echo") == 0);
 	cmd->builtin.is_cd = (ft_strcmp(cmd->matrix[0], "cd") == 0);

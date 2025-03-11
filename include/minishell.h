@@ -36,6 +36,7 @@
 # define ERR_CMD		"Command not found"
 # define ERR_TOKEN		"Tokenization error"
 # define ERR_PARSE		"Pars error"
+# define ERR_TOK	"minishell: syntax error near unexpected token `newline'\n"
 
 extern int	g_last_status;
 
@@ -234,10 +235,8 @@ int				is_special_char(char c);
 int				is_whitespace(char c);
 int				ft_strcmp(const char *s1, const char *s2);
 char			*ft_strcpy(char *dest, const char *src);
-int				process_arguments_to_commands(t_terminal *term);
 void			process_expansions(t_terminal *term);
 char			*generate_heredoc_filename(int index);
-int				setup_redirection(t_redirect_node *redir, t_terminal *term);
 char			*get_env_from_array(char **env, const char *name);
 void			check_cmd_exists(char *cmd_path, char *cmd);
 void			update_env_list_after_unset(t_terminal *term, char **args);
@@ -307,22 +306,21 @@ void			handle_append_redirect(t_redirect_node *node);
 /* executor_command.c */
 void			run_external_command(t_terminal *term, t_command_info *cmd);
 char			*find_cmd_path(t_terminal *term, char *cmd);
+char			*create_path(char ***paths, char *cmd);
 int				is_builtin_cmd(char *cmd);
 void			free_string_array(char **array);
 void			handle_cmd_error(char *cmd);
 
 /* heredoc.c */
 int				handle_heredoc_input(t_redirect_node *redir);
+void			heredoc_rl(char **content, t_redirect_node *redir);
 char			*init_heredoc_data(char *delimiter, t_terminal *term,
 					char **real_delimiter, int *expand_mode);
 char			*process_heredoc_content(char *line,
 					t_terminal *term, int expand_mode);
 void			free_heredoc_data(int expand_mode, char *real_delimiter,
 					t_terminal *term);
-char			*read_heredoc_lines(char *content, char *real_delimiter,
-					int expand_mode, t_terminal *term);
 char			*append_to_content(char *content, char *line);
-int				prepare_heredocs(t_terminal *term);
 void			assign_heredoc_indices(t_terminal *term);
 int				collect_heredocs_input(t_command_info *cmd);
 
@@ -369,15 +367,8 @@ void			cleanup_resources(void);
 // process_quote
 // process_special
 // update_env_list_after_unset
-// free_redirect_node
-// process_heredoc_delimiter
-// read_heredoc_content
-// setup_redirection
 // find_cmd_path
-// process_arguments_to_commands
-// create_redirect
 // handle_heredoc_delimiter
 // update_env_var
 // handle_heredoc_input
-// prepare_heredocs
 // handle_heredoc_redirect

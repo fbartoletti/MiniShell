@@ -14,8 +14,8 @@
 
 size_t	ft_strcspn(const char *str, const char *reject)
 {
-	size_t i;
-	size_t j;
+	size_t	i;
+	size_t	j;
 
 	i = 0;
 	while (str[i] != '\0')
@@ -34,7 +34,7 @@ size_t	ft_strcspn(const char *str, const char *reject)
 	return (i);
 }
 
-void	art()
+void	art(void)
 {
 	printf("  __  __ ___ _   _ ___ ____  _   _ _____ _     _     \n");
 	printf(" |  \\/  |_ _| \\ | |_ _/ ___|| | | | ____| |   | |    \n");

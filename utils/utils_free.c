@@ -17,7 +17,7 @@ void	free_arg_tokens(t_argument *args)
 	t_argument	*tmp;
 
 	if (!args)
-		return;
+		return ;
 	if (args->prev == args)
 		args->prev = NULL;
 	while (args)
@@ -34,12 +34,12 @@ void	free_cmd_list(t_command_info *cmd)
 	t_command_info	*tmp;
 
 	if (!cmd)
-		return;
+		return ;
 	if (cmd->prev == cmd)
 	{
 		free_cmd_content(cmd);
 		free(cmd);
-		return;
+		return ;
 	}
 	cmd->prev->next = NULL;
 	while (cmd)
@@ -50,14 +50,19 @@ void	free_cmd_list(t_command_info *cmd)
 		cmd = tmp;
 	}
 }
+
 void	free_string_array(char **array)
 {
 	int	i;
 
 	if (!array)
-		return;
-	for (i = 0; array[i]; i++)
+		return ;
+	i = 0;
+	while (array[i])
+	{
 		free(array[i]);
+		i++;
+	}
 	free(array);
 }
 

@@ -12,89 +12,10 @@
 
 #include "../include/minishell.h"
 
-char	*read_heredoc_content(char *delimiter, t_terminal *term)
-{
-	char	*content;
-	char	*line;
-	int		quote_mode;
-	char	*real_delimiter;
-
-	content = ft_strdup_safe("");
-	if (!content)
-		return (NULL);
-	quote_mode = (delimiter[0] == '\'' && 
-				 delimiter[ft_strlen(delimiter) - 1] == '\'');
-	if (quote_mode)
-		real_delimiter = ft_strtrim(delimiter, "'");
-	else
-		real_delimiter = ft_strdup_safe(delimiter);
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || ft_strcmp(line, real_delimiter) == 0)
-		{
-			free(line);
-			break;
-		}
-		if (!quote_mode && ft_strchr(line, '$'))
-		{
-			char *expanded = expand_vars(term, line);
-			free(line);
-			line = expanded;
-		}
-		content = append_to_content(content, line);
-		free(line);
-		if (!content)
-		{
-			free(real_delimiter);
-			return (NULL);
-		}
-	}
-	free(real_delimiter);
-	return (content);
-}
-
-int	process_heredoc_delimiter(char *input, int *i, t_argument **args)
-{
-	int			start;
-	char		*value;
-	t_argument	*arg;
-	int			quote_mode;
-
-	(*i) += 2;
-	while (input[*i] && is_whitespace(input[*i]))
-		(*i)++;
-	start = *i;
-	quote_mode = (input[*i] == '\'');
-	if (quote_mode)
-		(*i)++;
-	while (input[*i] && ((quote_mode && input[*i] != '\'') || 
-		(!quote_mode && !is_whitespace(input[*i]))))
-		(*i)++;
-	if (quote_mode && input[*i] == '\'')
-		(*i)++;
-	value = ft_substr(input, start, *i - start);
-	if (!value)
-		return (0);
-	arg = create_arg_token(FALSE, value);
-	if (!arg)
-	{
-		free(value);
-		return (0);
-	}
-	if (quote_mode)
-	{
-		arg->quote.none = FALSE;
-		arg->quote.single = TRUE;
-	}
-	add_arg_token(args, arg);
-	return (1);
-}
-
 void	handle_cmd_error(char *cmd)
 {
-	struct	stat st;
-	char	*error;
+	struct stat	st;
+	char		*error;
 
 	if (stat(cmd, &st) == 0)
 	{

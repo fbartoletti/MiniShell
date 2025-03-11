@@ -14,21 +14,22 @@
 
 int	change_directory(char *absolute_path, char *path, char *old_pwd)
 {
-	int	ret;
+	int		ret;
+	char	*new_pwd;
 
 	ret = chdir(absolute_path);
 	if (ret < 0)
 	{
 		free(absolute_path);
 		free(path);
-		return 1;
+		return (1);
 	}
 	if (old_pwd)
 	{
 		setenv("OLDPWD", old_pwd, 1);
 		free(old_pwd);
 	}
-	char *new_pwd = getcwd(NULL, 0);
+	new_pwd = getcwd(NULL, 0);
 	if (new_pwd)
 	{
 		setenv("PWD", new_pwd, 1);
@@ -36,8 +37,9 @@ int	change_directory(char *absolute_path, char *path, char *old_pwd)
 	}
 	free(absolute_path);
 	free(path);
-	return 0;
+	return (0);
 }
+
 int	cmd_export(t_terminal *term, char **args)
 {
 	int	i;

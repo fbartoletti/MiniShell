@@ -17,36 +17,16 @@ void	free_redirect_node(t_redirect_node *redir)
 	t_redirect_node	*tmp;
 
 	if (!redir)
-		return;
-	if (redir->prev == redir)
-	{
-		if (redir->fd_name)
-			free(redir->fd_name);
-		if (redir->heredoc)
-		{
-			if (redir->heredoc->delimiter)
-				free(redir->heredoc->delimiter);
-			if (redir->heredoc->temp_filename)
-			{
-				if (access(redir->heredoc->temp_filename, F_OK) == 0)
-					unlink(redir->heredoc->temp_filename);
-				free(redir->heredoc->temp_filename);
-			}
-			free(redir->heredoc);
-		}
-		free(redir);
-		return;
-	}
-	redir->prev->next = NULL;
+		return ;
+	if (redir->prev)
+		redir->prev->next = NULL;
 	while (redir)
 	{
 		tmp = redir->next;
-		if (redir->fd_name)
-			free(redir->fd_name);
+		free(redir->fd_name);
 		if (redir->heredoc)
 		{
-			if (redir->heredoc->delimiter)
-				free(redir->heredoc->delimiter);
+			free(redir->heredoc->delimiter);
 			if (redir->heredoc->temp_filename)
 			{
 				if (access(redir->heredoc->temp_filename, F_OK) == 0)
@@ -65,7 +45,7 @@ void	free_cmd_content(t_command_info *cmd)
 	int	i;
 
 	if (!cmd)
-		return;
+		return ;
 	if (cmd->matrix)
 	{
 		i = 0;
@@ -85,13 +65,13 @@ void	free_cmd_content(t_command_info *cmd)
 	}
 }
 
-void free_env_list(t_environment **env)
+void	free_env_list(t_environment **env)
 {
 	t_environment	*current;
 	t_environment	*next;
 
 	if (!*env)
-		return;
+		return ;
 	if ((*env)->prev == *env)
 		(*env)->prev = NULL;
 	current = *env;
@@ -110,7 +90,7 @@ void free_env_list(t_environment **env)
 	*env = NULL;
 }
 
-void cleanup_child(t_terminal *term)
+void	cleanup_child(t_terminal *term)
 {
 	term->args = NULL;
 	term->commands = NULL;
