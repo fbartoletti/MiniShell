@@ -38,24 +38,24 @@ int	count_heredocs(t_redirect_node *redir)
 }
 
 void	populate_heredocs(t_redirect_node *redir,
-t_command_info *cmd, t_redirect_node **heredocs)
+t_command_info **cmd, t_redirect_node ***heredocs)
 {
 	int	i;
 
 	i = 0;
-	redir = cmd->redirects;
+	redir = (*cmd)->redirects;
 	while (redir)
 	{
 		if (redir->type.is_heredoc)
 		{
-			heredocs[i] = redir;
+			(*heredocs)[i] = redir;
 			i++;
 		}
 		redir = redir->next;
 	}
 }
 
-void	heredoc_process(t_redirect_node **heredocs, int i, char *content)
+void	heredoc_process(t_redirect_node ***heredocs, int i, char **content)
 {
 	char	*line;
 	char	*temp;
@@ -63,23 +63,23 @@ void	heredoc_process(t_redirect_node **heredocs, int i, char *content)
 	while (1)
 	{
 		line = readline("");
-		if (!line || ft_strcmp(line, heredocs[i]->heredoc->delimiter) == 0)
+		if (!line || ft_strcmp(line, (*heredocs)[i]->heredoc->delimiter) == 0)
 		{
 			free(line);
 			break ;
 		}
-		temp = content;
-		content = ft_strjoin(content, line);
+		temp = (*content);
+		(*content) = ft_strjoin((*content), line);
 		free(temp);
 		free(line);
-		temp = content;
-		content = ft_strjoin(content, "\n");
+		temp = (*content);
+		(*content) = ft_strjoin((*content), "\n");
 		free(temp);
 		ft_putstr_fd("> ", 2);
 	}
 }
 
-int	handle_heredocs(int count, t_redirect_node **heredocs)
+int	handle_heredocs(int count, t_redirect_node ***heredocs)
 {
 	int		i;
 	int		pipe_fd[2];
@@ -91,16 +91,15 @@ int	handle_heredocs(int count, t_redirect_node **heredocs)
 		if (pipe(pipe_fd) < 0)
 		{
 			ft_putstr_fd("minishell: errore pipe heredoc\n", 2);
-			free(heredocs);
 			return (0);
 		}
 		content = ft_strdup_safe("");
 		ft_putstr_fd("> ", 2);
-		heredoc_process(heredocs, i, content);
+		heredoc_process(heredocs, i, &content);
 		write(pipe_fd[1], content, ft_strlen(content));
 		free(content);
 		close(pipe_fd[1]);
-		heredocs[i]->heredoc_fd = pipe_fd[0];
+		(*heredocs)[i]->heredoc_fd = pipe_fd[0];
 		i++;
 	}
 	return (1);

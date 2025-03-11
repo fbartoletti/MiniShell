@@ -157,8 +157,8 @@ void			init_terminal(t_terminal *term, char **env);
 void			free_input(t_terminal *term);
 void			free_terminal(t_terminal *term);
 int				check_syntax(char *line);
-int				processing(t_argument *current, t_terminal *term,
-					t_command_info	*cmd);
+int				processing(t_argument **current, t_terminal *term,
+					t_command_info	**cmd);
 int				process_input_line(t_terminal *term, char *line);
 void			cleanup_memory(t_terminal *term);
 
@@ -286,11 +286,11 @@ void			run_commands(t_terminal *term);
 void			setup_dup(t_terminal *term);
 int				count_heredocs(t_redirect_node *redir);
 void			populate_heredocs(t_redirect_node *redir,
-					t_command_info *cmd, t_redirect_node **heredocs);
-int				handle_heredocs(int count, t_redirect_node **heredocs);
+					t_command_info **cmd, t_redirect_node ***heredocs);
+int				handle_heredocs(int count, t_redirect_node ***heredocs);
 int				get_exit_code(int status);
 void			execute_pipeline(t_terminal *term);
-int				execute_commands(t_terminal *term);
+int				execute_commands(t_terminal *term, int *pipe_fd);
 void			handle_single_builtin(t_terminal *term);
 
 /* executor_redir.c */

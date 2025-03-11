@@ -60,8 +60,8 @@ int	collect_heredocs_input(t_command_info *cmd)
 	heredocs = (t_redirect_node **)malloc(sizeof(t_redirect_node *) * count);
 	if (!heredocs)
 		return (0);
-	populate_heredocs(redir, cmd, heredocs);
-	if (handle_heredocs(count, heredocs) == 0)
+	populate_heredocs(redir, &cmd, &heredocs);
+	if (handle_heredocs(count, &heredocs) == 0)
 		return (0);
 	free(heredocs);
 	return (1);
@@ -69,9 +69,10 @@ int	collect_heredocs_input(t_command_info *cmd)
 
 void	execute_pipeline(t_terminal *term)
 {
+	int	pipe_fd[2];
 	int	status;
 
-	if (execute_commands(term) != 0)
+	if (execute_commands(term, pipe_fd) != 0)
 		return ;
 	while (wait(&status) > 0)
 	{

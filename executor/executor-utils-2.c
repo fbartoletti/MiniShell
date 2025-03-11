@@ -22,47 +22,47 @@ void	check_prev_fd(int *prev_fd)
 	}
 }
 
-void	parent(int *prev_fd, t_command_info *cmd,
+void	parent(int *prev_fd, t_command_info **cmd,
 int *pipe_fd, t_terminal *term)
 {
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	check_prev_fd(prev_fd);
-	if (cmd->next)
+	if ((*cmd)->next)
 	{
 		close(pipe_fd[0]);
 		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
 			perror("dup2 output");
 		close(pipe_fd[1]);
 	}
-	setup_input_redirects(cmd->redirects);
-	setup_output_redirects(cmd->redirects);
-	if (cmd->matrix && cmd->matrix[0])
+	setup_input_redirects((*cmd)->redirects);
+	setup_output_redirects((*cmd)->redirects);
+	if ((*cmd)->matrix && (*cmd)->matrix[0])
 	{
-		if (is_builtin_cmd(cmd->matrix[0]))
+		if (is_builtin_cmd((*cmd)->matrix[0]))
 		{
-			execute_builtin_command(term, cmd);
+			execute_builtin_command(term, (*cmd));
 			exit(g_last_status);
 		}
 		else
-			run_external_command(term, cmd);
+			run_external_command(term, (*cmd));
 	}
 	exit(0);
 }
 
-void	children(int *prev_fd, t_command_info *cmd, int *pipe_fd)
+void	children(int *prev_fd, t_command_info **cmd, int *pipe_fd)
 {
 	if ((*prev_fd) != -1)
 		close((*prev_fd));
-	if (cmd->next)
+	if ((*cmd)->next)
 	{
 		close(pipe_fd[1]);
 		(*prev_fd) = pipe_fd[0];
 	}
-	cmd = cmd->next;
+	(*cmd) = (*cmd)->next;
 }
 
-int	generate_pid(int *prev_fd, t_command_info *cmd,
+int	generate_pid(int *prev_fd, t_command_info **cmd,
 int *pipe_fd, t_terminal *term)
 {
 	pid_t	pid;
@@ -73,7 +73,7 @@ int *pipe_fd, t_terminal *term)
 		perror("fork");
 		if ((*prev_fd) != -1)
 			close((*prev_fd));
-		if (cmd->next)
+		if ((*cmd)->next)
 		{
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
@@ -87,12 +87,12 @@ int *pipe_fd, t_terminal *term)
 	return (0);
 }
 
-int	execute_commands(t_terminal *term)
+int	execute_commands(t_terminal *term, int *pipe_fd)
 {
 	int				prev_fd;
-	int				pipe_fd[2];
 	t_command_info	*cmd;
 
+	prev_fd = -1;
 	cmd = term->commands;
 	while (cmd)
 	{
@@ -108,7 +108,7 @@ int	execute_commands(t_terminal *term)
 				close(prev_fd);
 			return (1);
 		}
-		if (generate_pid(&prev_fd, cmd, pipe_fd, term) != 0)
+		if (generate_pid(&prev_fd, &cmd, pipe_fd, term) != 0)
 			return (1);
 	}
 	if (prev_fd != -1)

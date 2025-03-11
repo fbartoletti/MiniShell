@@ -104,7 +104,7 @@ int	process_input_line(t_terminal *term, char *line)
 	cmd = create_cmd();
 	if (!cmd)
 		return (0);
-	if (processing(current, term, cmd) == 0)
+	if (processing(&current, term, &cmd) == 0)
 		return (0);
 	if (cmd->matrix || cmd->redirects)
 	{

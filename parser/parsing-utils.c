@@ -12,30 +12,30 @@
 
 #include "../include/minishell.h"
 
-int	processing(t_argument *current, t_terminal *term, t_command_info *cmd)
+int	processing(t_argument **current, t_terminal *term, t_command_info **cmd)
 {
 	int	ret;
 
-	while (current)
+	while ((*current))
 	{
-		ret = handle_token(term, current, cmd);
+		ret = handle_token(term, (*current), (*cmd));
 		if (ret == 0)
 		{
-			free_cmd_content(cmd);
-			free(cmd);
+			free_cmd_content((*cmd));
+			free((*cmd));
 			return (0);
 		}
-		if (ret == 2 && current->next)
-			current = current->next->next;
-		else if (ret == 1 && current->token.is_pipe)
+		if (ret == 2 && (*current)->next)
+			(*current) = (*current)->next->next;
+		else if (ret == 1 && (*current)->token.is_pipe)
 		{
-			cmd = create_cmd();
-			if (!cmd)
+			(*cmd) = create_cmd();
+			if (!(*cmd))
 				return (0);
-			current = current->next;
+			(*current) = (*current)->next;
 		}
 		else
-			current = current->next;
+			(*current) = (*current)->next;
 	}
 	return (1);
 }
