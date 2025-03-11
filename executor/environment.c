@@ -46,7 +46,7 @@ void	add_env_node(t_environment **env, t_environment *new)
 	{
 		*env = new;
 		new->prev = new;
-		return;
+		return ;
 	}
 	last = *env;
 	while (last->next)

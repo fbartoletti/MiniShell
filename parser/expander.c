@@ -30,8 +30,8 @@ char	*extract_var_name(char *str, int *i)
 	}
 	else
 	{
-		while (str[start + len] && (ft_isalnum(str[start + len]) || 
-			   str[start + len] == '_'))
+		while (str[start + len] && (ft_isalnum(str[start + len])
+				|| str[start + len] == '_'))
 			len++;
 	}
 	if (len == 0)

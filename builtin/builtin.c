@@ -37,7 +37,8 @@ int	cmd_echo(t_terminal *term, char **args)
 	return (0);
 }
 
-int	ft_cd_handle_path(t_terminal *term, char **args, char **path, char **old_pwd)
+int	ft_cd_handle_path(t_terminal *term, char **args,
+char **path, char **old_pwd)
 {
 	*old_pwd = getcwd(NULL, 0);
 	if (!*old_pwd)

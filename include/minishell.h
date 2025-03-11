@@ -109,7 +109,7 @@ typedef struct s_redirect_node
 	t_heredoc_data			*heredoc;
 	int						heredoc_fd;
 	t_redirect				type;
-	struct s_redirect_node  *next;
+	struct s_redirect_node	*next;
 	struct s_redirect_node	*prev;
 }							t_redirect_node;
 
@@ -157,12 +157,14 @@ void			init_terminal(t_terminal *term, char **env);
 void			free_input(t_terminal *term);
 void			free_terminal(t_terminal *term);
 int				check_syntax(char *line);
+int				processing(t_argument *current, t_terminal *term,
+					t_command_info	*cmd);
 int				process_input_line(t_terminal *term, char *line);
 void			cleanup_memory(t_terminal *term);
 
 /* art.c */
 size_t			ft_strcspn(const char *str, const char *reject);
-void			art();
+void			art(void);
 
 /* signal.c */
 void			setup_interactive_signals(void);
@@ -175,7 +177,8 @@ void			process_input(t_terminal *term);
 t_argument		*tokenize_input(char *input);
 t_argument		*create_arg_token(t_boolean is_token, char *value);
 void			add_arg_token(t_argument **args, t_argument *new);
-int				handle_token(t_terminal *term, t_argument *token, t_command_info *cmd);
+int				handle_token(t_terminal *term,
+					t_argument *token, t_command_info *cmd);
 t_command_info	*create_cmd(void);
 void			add_cmd(t_command_info **cmds, t_command_info *new);
 void			process_redirections(t_command_info *cmd, t_argument *token);
@@ -183,8 +186,19 @@ t_redirect_node	*create_redirect(t_redirect type, char *file);
 void			add_redirect(t_command_info *cmd, t_redirect_node *redirect);
 int				is_redir_token(t_token_info token);
 void			add_command_to_shell(t_terminal *term, t_command_info *cmd);
-t_argument		*process_quote(char *input, int *i, char quote, t_argument **args);
+t_argument		*process_quote(char *input,
+					int *i, char quote, t_argument **args);
+t_argument		*handling_arg(char quote, char *value);
 t_argument		*process_special(char *input, int *i, t_argument **args);
+t_argument		*case_1(int *i, char *input, t_argument **args);
+t_argument		*case_1_helper(char *value, int *i, char *input);
+void			case_2(t_token_info *token_type, int *token_len);
+void			case_3(t_token_info *token_type);
+void			case_4(t_token_info *token_type);
+void			case_5(t_token_info *token_type);
+char			*check_token_len(int *token_len, char c, int *i);
+t_argument		*handle_arg(char *value, t_token_info	*token_type,
+					t_argument **args);
 t_argument		*process_word(char *input, int *i, t_argument **args);
 
 /* expansion.c */
@@ -192,14 +206,16 @@ char			*expand_vars(t_terminal *term, char *str);
 char			*get_env_var_value(char **env, char *key);
 char			*get_status_str(t_terminal *term);
 char			*extract_var_name(char *str, int *i);
-char			*expand_variable(t_terminal *term, char *str, int *i, char *result);
+char			*expand_variable(t_terminal *term,
+					char *str, int *i, char *result);
 char			*add_char(char *str, char c);
 int				expand_cmd_args(t_terminal *term, t_command_info *cmd);
 
 /* quotes.c */
 char			*handle_quote_parsing(t_terminal *term, char *str);
 char			*process_single_quote(char *str, int *i, char *result);
-char			*process_double_quote(t_terminal *term, char *str, int *i, char *result);
+char			*process_double_quote(t_terminal *term,
+					char *str, int *i, char *result);
 char			*get_single_quote_content(char *str, int *i);
 char			*get_double_quote_content(t_terminal *term, char *str, int *i);
 
@@ -233,20 +249,25 @@ void			print_export_var(char *var);
 int				print_export_env(t_terminal *term);
 char			*create_env_string(char *name, char *value);
 void			sort_env_array(char **env, int size);
-int				ft_export_create_or_update_env(t_terminal *term, char *name, char *env_string);
+int				ft_export_create_or_update_env(t_terminal *term,
+					char *name, char *env_string);
 int				ft_export_print_env(t_terminal *term);
 int				handle_no_equal(t_terminal *term, char *name, char *value);
 int				handle_error(char *name, char *value);
 t_redirect_node	*create_heredoc_queue(void);
 void			add_to_heredoc_queue(t_redirect_node **queue, char *delimiter);
-char			*process_heredoc_queue(t_terminal *term, t_redirect_node *queue);
-void			export_env_var(t_terminal *term, const char *var_name, const char *value);
+char			*process_heredoc_queue(t_terminal *term,
+					t_redirect_node *queue);
+void			export_env_var(t_terminal *term,
+					const char *var_name, const char *value);
 void			update_pwd_env(t_terminal *term, const char *old_pwd);
 char			*create_quoted_value(char *value, char quote);
 void			execute_child_process(t_terminal *term, t_command_info *cmd);
 int				expand_command_args(t_terminal *term, t_command_info *cmd);
-int				handle_heredoc_delimiter(char *input, int *i, t_argument **args);
-int				create_special_token(t_argument **args, char *value, t_token_info type);
+int				handle_heredoc_delimiter(char *input,
+					int *i, t_argument **args);
+int				create_special_token(t_argument **args,
+					char *value, t_token_info type);
 t_token_info	get_token_type(char *input, int i, int *len);
 void			handle_redirections(t_command_info *cmd);
 int				execute_builtin(t_terminal *term, t_command_info *cmd);
@@ -256,13 +277,20 @@ int				count_valid_commands(t_command_info *cmd);
 void			wait_for_processes(int cmd_count);
 void			init_pipe_fds(int *pipe_fd, int *prev_pipe);
 void			lose_pipe_fds(int *pipe_fd, int prev_pipe);
-int				change_directory(char *absolute_path, char *path, char *old_pwd);
+int				change_directory(char *absolute_path,
+					char *path, char *old_pwd);
 int				is_numeric(char *str);
 
 /* executor.c */
 void			run_commands(t_terminal *term);
+void			setup_dup(t_terminal *term);
+int				count_heredocs(t_redirect_node *redir);
+void			populate_heredocs(t_redirect_node *redir,
+					t_command_info *cmd, t_redirect_node **heredocs);
+int				handle_heredocs(int count, t_redirect_node **heredocs);
 int				get_exit_code(int status);
 void			execute_pipeline(t_terminal *term);
+int				execute_commands(t_terminal *term);
 void			handle_single_builtin(t_terminal *term);
 
 /* executor_redir.c */
@@ -287,7 +315,8 @@ void			handle_cmd_error(char *cmd);
 int				handle_heredoc_input(t_redirect_node *redir);
 char			*init_heredoc_data(char *delimiter, t_terminal *term,
 					char **real_delimiter, int *expand_mode);
-char			*process_heredoc_content(char *line, t_terminal *term, int expand_mode);
+char			*process_heredoc_content(char *line,
+					t_terminal *term, int expand_mode);
 void			free_heredoc_data(int expand_mode, char *real_delimiter,
 					t_terminal *term);
 char			*read_heredoc_lines(char *content, char *real_delimiter,
@@ -307,14 +336,16 @@ int				cmd_exit(t_terminal *term, char **args);
 int				cmd_export(t_terminal *term, char **args);
 int				cmd_unset(t_terminal *term, char **args);
 int				cmd_env(t_terminal *term, char **args);
-int				ft_cd_handle_path(t_terminal *term, char **args, char **path, char **old_pwd);
+int				ft_cd_handle_path(t_terminal *term,
+					char **args, char **path, char **old_pwd);
 
 /* environment.c */
 void			init_environment(t_terminal *term, char **env);
 void			create_env_node(t_terminal *term, char *var);
 void			add_env_node(t_environment **env, t_environment *new);
 char			*get_env_var(t_environment *env, const char *name);
-void			update_env_var(t_terminal *term, const char *name, const char *value);
+void			update_env_var(t_terminal *term,
+					const char *name, const char *value);
 int				find_env_var_index(char **env, char *name);
 void			add_new_env_var(t_terminal *term, char *var_string);
 void			update_shell_level(t_terminal *term);

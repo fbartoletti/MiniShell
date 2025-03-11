@@ -12,7 +12,7 @@
 
 #include "../include/minishell.h"
 
-void setup_interactive_signals(void)
+void	setup_interactive_signals(void)
 {
 	struct sigaction	sa;
 

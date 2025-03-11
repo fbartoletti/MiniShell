@@ -28,25 +28,7 @@ t_argument	*process_quote(char *input, int *i, char quote, t_argument **args)
 	value = ft_substr(input, start, j - start);
 	if (!value)
 		return (NULL);
-	if (quote == '\'')
-	{
-		char *temp = value;
-		value = ft_strjoin("\1", value);
-		free(temp);
-		if (!value)
-			return (NULL);
-	}
-	arg = create_arg_token(FALSE, value);
-	if (!arg)
-	{
-		free(value);
-		return (NULL);
-	}
-	arg->quote.none = FALSE;
-	if (quote == '\'')
-		arg->quote.single = TRUE;
-	else
-		arg->quote.dbl = TRUE; 
+	arg = handling_arg(quote, value);
 	*i = j + 1;
 	add_arg_token(args, arg);
 	return (arg);
@@ -63,93 +45,19 @@ t_argument	*process_special(char *input, int *i, t_argument **args)
 	c = input[*i];
 	token_len = 1;
 	if (input[*i] == '<' && input[*i + 1] == '<')
-	{
-		value = ft_strdup_safe("<<");
-		arg = create_arg_token(TRUE, value);
-		if (!arg)
-		{
-			free(value);
-			return (NULL);
-		}
-		arg->token.is_heredoc = TRUE;
-		add_arg_token(args, arg);
-		*i += 2;
-		while (input[*i] && is_whitespace(input[*i]))
-			(*i)++;
-		if (!input[*i] || input[*i] == '\0')
-		{
-			ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
-			return (NULL);
-		}
-		int start = *i;
-		int quote_mode = (input[*i] == '\'');
-		if (quote_mode)
-			(*i)++;
-		while (input[*i] && ((quote_mode && input[*i] != '\'') ||
-				(!quote_mode && !is_whitespace(input[*i]) && !is_special_char(input[*i]))))
-			(*i)++;
-		if (quote_mode && input[*i] == '\'')
-			(*i)++;
-		value = ft_substr(input, start, *i - start);
-		arg = create_arg_token(FALSE, value);
-		if (!arg)
-		{
-			free(value);
-			return (NULL);
-		}
-		add_arg_token(args, arg);
-		return (arg);
-	}
+		return (case_1(i, input, args));
 	else if (input[*i] == '>' && input[*i + 1] == '>')
-	{
-		token_len = 2;
-		ft_memset(&token_type, 0, sizeof(t_token_info));
-		token_type.is_token = TRUE;
-		token_type.is_append = TRUE;
-	}
+		case_2(&token_type, &token_len);
 	else if (input[*i] == '<')
-	{
-		ft_memset(&token_type, 0, sizeof(t_token_info));
-		token_type.is_token = TRUE;
-		token_type.is_infile = TRUE;
-	}
+		case_3(&token_type);
 	else if (input[*i] == '>')
-	{
-		ft_memset(&token_type, 0, sizeof(t_token_info));
-		token_type.is_token = TRUE;
-		token_type.is_outfile = TRUE;
-	}
+		case_4(&token_type);
 	else if (input[*i] == '|')
-	{
-		ft_memset(&token_type, 0, sizeof(t_token_info));
-		token_type.is_token = TRUE;
-		token_type.is_pipe = TRUE;
-	}
+		case_5(&token_type);
 	else
 		return (NULL);
-	if (token_len == 2)
-	{
-		value = alloc_mem(3);
-		value[0] = c;
-		value[1] = c;
-		value[2] = '\0';
-		(*i) += 2;
-	}
-	else
-	{
-		value = alloc_mem(2);
-		value[0] = c;
-		value[1] = '\0';
-		(*i)++;
-	}
-	arg = create_arg_token(TRUE, value);
-	if (!arg)
-	{
-		free(value);
-		return (NULL);
-	}
-	arg->token = token_type;
-	add_arg_token(args, arg);
+	value = check_token_len(&token_len, c, i);
+	arg = handle_arg(value, &token_type, args);
 	return (arg);
 }
 
@@ -160,9 +68,9 @@ t_argument	*process_word(char *input, int *i, t_argument **args)
 	int			start;
 
 	start = *i;
-	while (input[*i] && !is_whitespace(input[*i]) &&
-		   input[*i] != '\'' && input[*i] != '"' &&
-		   !is_special_char(input[*i]))
+	while (input[*i] && !is_whitespace(input[*i])
+		&& input[*i] != '\'' && input[*i] != '"'
+		&& !is_special_char(input[*i]))
 		(*i)++;
 	value = alloc_mem(*i - start + 1);
 	if (!value)

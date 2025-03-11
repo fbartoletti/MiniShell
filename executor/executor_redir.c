@@ -33,7 +33,7 @@ void	setup_input_redirects(t_redirect_node *redir)
 	t_redirect_node	*node;
 
 	if (!redir)
-		return;
+		return ;
 	node = redir;
 	while (node)
 	{
@@ -48,9 +48,9 @@ void	setup_input_redirects(t_redirect_node *redir)
 void	setup_output_redirects(t_redirect_node *redir)
 {
 	t_redirect_node	*node;
-	
+
 	if (!redir)
-		return;
+		return ;
 	node = redir;
 	while (node)
 	{

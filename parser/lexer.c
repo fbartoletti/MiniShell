@@ -73,7 +73,7 @@ void	add_arg_token(t_argument **args, t_argument *new)
 	t_argument	*tmp;
 
 	if (!args || !new)
-		return;
+		return ;
 	if (!*args)
 	{
 		*args = new;

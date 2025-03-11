@@ -54,11 +54,13 @@ void	init_terminal(t_terminal *term, char **env)
 	init_signals();
 }
 
-static void process_line(t_terminal *term, char *line)
+static void	process_line(t_terminal *term, char *line)
 {
+	t_command_info	*cmd;
+
 	if (!process_input_line(term, line))
-		return;
-	t_command_info *cmd = term->commands;
+		return ;
+	cmd = term->commands;
 	while (cmd)
 	{
 		expand_cmd_args(term, cmd);
@@ -67,7 +69,7 @@ static void process_line(t_terminal *term, char *line)
 	if (term->error)
 	{
 		cleanup_memory(term);
-		return;
+		return ;
 	}
 	run_commands(term);
 	cleanup_memory(term);
@@ -77,18 +79,16 @@ int	main(int ac, char **av, char **env)
 {
 	t_terminal	term;
 	char		*line;
-	
-	(void)ac;
-	(void)av;
+
 	init_terminal(&term, env);
 	art();
-	while (1)
+	while (1 || !ac || !av)
 	{
 		line = readline("minishell> ");
 		if (!line)
 		{
 			printf("\nexit shell ...\n");
-			break;
+			break ;
 		}
 		if (line[0] != '\0')
 		{

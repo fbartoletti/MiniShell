@@ -9,6 +9,9 @@ SRCS = main/main.c \
 	parser/lexer.c \
 	parser/expander.c \
 	parser/quote_handler.c \
+	parser/parsing-utils.c \
+	parser/process-utils.c \
+	parser/process-utils-2.c \
 	utils/art.c \
 	utils/utils.c \
 	utils/utils_env.c \
@@ -35,6 +38,8 @@ SRCS = main/main.c \
 	executor/exec.c \
 	executor/exe.c \
 	executor/executor.c \
+	executor/executor-utils.c \
+	executor/executor-utils-2.c \
 	executor/signals.c \
 	executor/executor_redir.c \
 	executor/environment.c \

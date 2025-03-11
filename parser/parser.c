@@ -43,7 +43,7 @@ void	add_cmd(t_command_info **commands, t_command_info *new)
 	{
 		*commands = new;
 		new->prev = new;
-		return;
+		return ;
 	}
 	tmp = *commands;
 	while (tmp->next)
@@ -55,13 +55,14 @@ void	add_cmd(t_command_info **commands, t_command_info *new)
 
 int	is_redir_token(t_token_info token)
 {
-	return (token.is_infile || token.is_outfile || 
-			token.is_append || token.is_heredoc);
+	return (token.is_infile || token.is_outfile
+		|| token.is_append || token.is_heredoc);
 }
 
 void	process_redirections(t_command_info *cmd, t_argument *token)
 {
-	t_redirect	type;
+	t_redirect		type;
+	t_redirect_node	*redirect;
 
 	ft_memset(&type, 0, sizeof(t_redirect));
 	type.is_redirect = TRUE;
@@ -75,8 +76,8 @@ void	process_redirections(t_command_info *cmd, t_argument *token)
 		type.is_heredoc = TRUE;
 	token = token->next;
 	if (!token)
-		return;
-	t_redirect_node *redirect = create_redirect(type, token->str);
+		return ;
+	redirect = create_redirect(type, token->str);
 	if (redirect)
 		add_redirect(cmd, redirect);
 }

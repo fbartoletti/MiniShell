@@ -14,6 +14,8 @@
 
 void	add_command_to_shell(t_terminal *term, t_command_info *cmd)
 {
+	t_command_info	*tmp;
+
 	identify_builtin(cmd);
 	if (!term->commands)
 	{
@@ -22,7 +24,7 @@ void	add_command_to_shell(t_terminal *term, t_command_info *cmd)
 	}
 	else
 	{
-		t_command_info *tmp = term->commands;
+		tmp = term->commands;
 		while (tmp->next)
 			tmp = tmp->next;
 		tmp->next = cmd;
@@ -94,7 +96,6 @@ int	process_input_line(t_terminal *term, char *line)
 {
 	t_argument		*current;
 	t_command_info	*cmd;
-	int				ret;
 
 	term->args = tokenize_input(line);
 	if (!term->args)
@@ -103,27 +104,8 @@ int	process_input_line(t_terminal *term, char *line)
 	cmd = create_cmd();
 	if (!cmd)
 		return (0);
-	while (current)
-	{
-		ret = handle_token(term, current, cmd);
-		if (ret == 0)
-		{
-			free_cmd_content(cmd);
-			free(cmd);
-			return (0);
-		}
-		if (ret == 2 && current->next)
-			current = current->next->next;
-		else if (ret == 1 && current->token.is_pipe)
-		{
-			cmd = create_cmd();
-			if (!cmd)
-				return (0);
-			current = current->next;
-		}
-		else
-			current = current->next;
-	}
+	if (processing(current, term, cmd) == 0)
+		return (0);
 	if (cmd->matrix || cmd->redirects)
 	{
 		identify_builtin(cmd);
