@@ -79,3 +79,21 @@ void	init_environment(t_terminal *term, char **env)
 		i++;
 	}
 }
+
+void	update_shell_level(t_terminal *term)
+{
+	char	*shlvl_str;
+	int		shlvl_val;
+	char	*new_shlvl_str;
+
+	shlvl_str = get_env_var(term->env, "SHLVL");
+	if (!shlvl_str || !*shlvl_str)
+		shlvl_val = 1;
+	else
+		shlvl_val = ft_atoi(shlvl_str) + 1;
+	new_shlvl_str = ft_itoa(shlvl_val);
+	if (!new_shlvl_str)
+		return;
+	update_env_var(term, "SHLVL", new_shlvl_str);
+	free(new_shlvl_str);
+}

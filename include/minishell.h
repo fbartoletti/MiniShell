@@ -349,6 +349,7 @@ void			add_new_env_var(t_terminal *term, char *var_string);
 void			update_shell_level(t_terminal *term);
 void			update_env_array(t_terminal *term);
 void			free_env_list(t_environment **env);
+void			update_shell_level(t_terminal *term);
 
 /* cleanup.c */
 void			free_redirect_node(t_redirect_node *redir);

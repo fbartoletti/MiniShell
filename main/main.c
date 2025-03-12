@@ -51,6 +51,7 @@ void	init_terminal(t_terminal *term, char **env)
 	term->stdin_copy = -1;
 	term->stdout_copy = -1;
 	init_environment(term, env);
+	update_shell_level(term);
 	init_signals();
 }
 
