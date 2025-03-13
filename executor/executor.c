@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 12:31:12 by barto             #+#    #+#             */
-/*   Updated: 2025/03/03 14:22:15 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/13 16:05:10 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	run_commands(t_terminal *term)
 	restore_io(term);
 }
 
-int	collect_heredocs_input(t_command_info *cmd)
+int	collect_heredocs_input(t_command_info *cmd, t_terminal *term)
 {
 	t_redirect_node	*redir;
 	t_redirect_node	**heredocs;
@@ -61,7 +61,7 @@ int	collect_heredocs_input(t_command_info *cmd)
 	if (!heredocs)
 		return (0);
 	populate_heredocs(redir, &cmd, &heredocs);
-	if (handle_heredocs(count, &heredocs) == 0)
+	if (handle_heredocs(count, &heredocs, term) == 0)
 		return (0);
 	free(heredocs);
 	return (1);

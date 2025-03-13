@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executor-utils.c                                   :+:      :+:    :+:   */
+/*   executor_norm.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fgiampa <fgiampa@student.42roma.it>        +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 02:56:03 by fgiampa           #+#    #+#             */
-/*   Updated: 2025/03/11 02:56:08 by fgiampa          ###   ########.fr       */
+/*   Updated: 2025/03/13 16:17:52 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ t_command_info **cmd, t_redirect_node ***heredocs)
 	}
 }
 
-void	heredoc_process(t_redirect_node ***heredocs, int i, char **content)
+void	heredoc_process(t_redirect_node ***heredocs, int i, char **content, t_terminal *term)
 {
 	char	*line;
 	char	*temp;
@@ -63,6 +63,7 @@ void	heredoc_process(t_redirect_node ***heredocs, int i, char **content)
 	while (1)
 	{
 		line = readline("");
+		line = expand_vars(term, line);
 		if (!line || ft_strcmp(line, (*heredocs)[i]->heredoc->delimiter) == 0)
 		{
 			free(line);
@@ -79,7 +80,7 @@ void	heredoc_process(t_redirect_node ***heredocs, int i, char **content)
 	}
 }
 
-int	handle_heredocs(int count, t_redirect_node ***heredocs)
+int	handle_heredocs(int count, t_redirect_node ***heredocs, t_terminal *term)
 {
 	int		i;
 	int		pipe_fd[2];
@@ -95,7 +96,7 @@ int	handle_heredocs(int count, t_redirect_node ***heredocs)
 		}
 		content = ft_strdup_safe("");
 		ft_putstr_fd("> ", 2);
-		heredoc_process(heredocs, i, &content);
+		heredoc_process(heredocs, i, &content, term);
 		write(pipe_fd[1], content, ft_strlen(content));
 		free(content);
 		close(pipe_fd[1]);

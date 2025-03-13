@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 17:04:18 by barto             #+#    #+#             */
-/*   Updated: 2025/03/03 14:20:04 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/13 16:11:21 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,7 @@ void			setup_dup(t_terminal *term);
 int				count_heredocs(t_redirect_node *redir);
 void			populate_heredocs(t_redirect_node *redir,
 					t_command_info **cmd, t_redirect_node ***heredocs);
-int				handle_heredocs(int count, t_redirect_node ***heredocs);
+int				handle_heredocs(int count, t_redirect_node ***heredocs, t_terminal *term);
 int				get_exit_code(int status);
 void			execute_pipeline(t_terminal *term);
 int				execute_commands(t_terminal *term, int *pipe_fd);
@@ -322,7 +322,7 @@ void			free_heredoc_data(int expand_mode, char *real_delimiter,
 					t_terminal *term);
 char			*append_to_content(char *content, char *line);
 void			assign_heredoc_indices(t_terminal *term);
-int				collect_heredocs_input(t_command_info *cmd);
+int				collect_heredocs_input(t_command_info *cmd, t_terminal *term);
 
 /* builtin.c */
 void			execute_builtin_command(t_terminal *term, t_command_info *cmd);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executor-utils-2.c                                 :+:      :+:    :+:   */
+/*   executor_norm_2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fgiampa <fgiampa@student.42roma.it>        +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 03:54:54 by fgiampa           #+#    #+#             */
-/*   Updated: 2025/03/11 03:54:56 by fgiampa          ###   ########.fr       */
+/*   Updated: 2025/03/13 16:04:43 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ int	execute_commands(t_terminal *term, int *pipe_fd)
 	cmd = term->commands;
 	while (cmd)
 	{
-		if (!collect_heredocs_input(cmd))
+		if (!collect_heredocs_input(cmd, term))
 		{
 			ft_putstr_fd("minishell: errore raccolta heredoc\n", 2);
 			return (1);
