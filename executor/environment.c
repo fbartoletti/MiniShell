@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   environment.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ubuntu <ubuntu@student.42.fr>              +#+  +:+       +#+        */
+/*   By: fbartole <fbartole@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/28 12:00:00 by fbartole          #+#    #+#             */
-/*   Updated: 2025/02/28 14:20:27 by ubuntu           ###   ########.fr       */
+/*   Updated: 2025/03/13 15:24:45 by fbartole         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	update_shell_level(t_terminal *term)
 		shlvl_val = ft_atoi(shlvl_str) + 1;
 	new_shlvl_str = ft_itoa(shlvl_val);
 	if (!new_shlvl_str)
-		return;
+		return ;
 	update_env_var(term, "SHLVL", new_shlvl_str);
 	free(new_shlvl_str);
 }
